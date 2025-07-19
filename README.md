@@ -34,7 +34,7 @@ A Laravel-based web platform designed for doctoral candidates to submit research
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/jaspi-manuscript-system.git
+git clone https://github.com/singh-sajal/jaspi_manuscript.git
 cd jaspi-manuscript-system
 ```
 
