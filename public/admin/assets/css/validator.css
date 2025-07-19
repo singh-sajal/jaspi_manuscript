@@ -1,0 +1,45 @@
+/* Invalid input after interaction (not placeholder) */
+input:invalid:not(:placeholder-shown) {
+    outline-color: #dc3545 !important;
+    /* box-shadow: 0 0 0 0.15rem rgba(220, 53, 69, 0.2); */
+}
+
+/* Valid input after interaction */
+input:valid:not(:placeholder-shown) {
+    outline-color: #28a745 !important;
+    /* box-shadow: 0 0 0 0.15rem rgba(40, 167, 69, 0.2); */
+}
+.validation-error {
+    /* border-bottom: 1px solid #ff0000; */
+    box-shadow: 0px 0px 2px 0px rgba(255, 0, 0, 1) !important;
+    -webkit-box-shadow: 0px 0px 2px 0px rgba(255, 0, 0, 1) !important;
+    -moz-box-shadow: 0px 0px 2px 0px rgba(255, 0, 0, 1) !important;
+    -o-box-shadow: 0px 0px 2px 0px rgba(255, 0, 0, 1) !important;
+}
+
+.validation-success {
+    /* border-bottom: 1px solid #008733; */
+    -webkit-box-shadow: 0px 0px 2px 0px rgba(0, 135, 52, 1) !important;
+    -moz-box-shadow: 0px 0px 2px 0px rgba(0, 135, 52, 1) !important;
+    -o-box-shadow: 0px 0px 2px 0px rgba(0, 135, 52, 1) !important;
+    box-shadow: 0px 0px 2px 0px rgba(0, 135, 52, 1) !important;
+}
+
+span[data-error] {
+    font-weight: 600;
+}
+
+span.toggler:hover {
+    text-decoration: underline;
+}
+
+label.required {
+    color: #888888 !important;
+}
+
+label.required::after,
+span.required::after {
+    content: "*";
+    color: red !important;
+    margin-left: 2px;
+}

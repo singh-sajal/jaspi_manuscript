@@ -1,0 +1,101 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        // Schema::create('doc_submissions', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->uuid('uuid');
+        //     $table->string('email');
+        //     $table->string('submission_type');
+        //     $table->string('jaspi_id');
+        //     $table->string('article_type');
+        //     $table->string('article_title');
+        //     $table->string('author_name')->comment('Name of corresponding author');
+        //     $table->string('phone_no')->comment('phone of corresponding author');
+        //     $table->string('author_affiliation')->comment('Affiliation of the Corresponding Author');
+        //     $table->string('author_orcid_id')->comment('ORCID ID of the Corresponding Author');
+        //     $table->string('author_saspi_id')->comment('SASPI ID of corresponding author');
+        //     $table->longText('co_author_data')->comment('Name, email, phone no of Co-Authors');
+        //     $table->string('cover_letter_name')->nullable();
+        //     $table->string('cover_letter_type')->nullable();
+        //     $table->string('cover_letter_url')->nullable();
+        //     $table->string('cover_letter_size')->nullable();
+        //     $table->string('first_page_name')->nullable();
+        //     $table->string('first_page_type')->nullable();
+        //     $table->string('first_page_url')->nullable();
+        //     $table->string('first_page_size')->nullable();
+        //     $table->string('script_name')->nullable();
+        //     $table->string('script_type')->nullable();
+        //     $table->string('script_url')->nullable();
+        //     $table->string('script_size')->nullable();
+        //     $table->longText('track_changes')->nullable()->comment('Manuscript File with Track changes or changes highlighted');
+        //     $table->longText('icmje_declaration')->nullable();
+        //     $table->longText('supplementary_files')->nullable();
+        //     $table->timestamps();
+        // });
+
+        Schema::create('doc_submissions', function (Blueprint $table) {
+            $table->id();
+            $table->uuid('uuid');
+            $table->string('email')->nullable()->comment('Email of the submitting author');
+            // $table->string('submission_type')->nullable()->comment('Type of submission');
+            // $table->string('jaspi_id')->nullable()->comment('JASPI ID of the author');
+            // $table->string('article_type')->nullable()->comment('Type of the article being submitted');
+            $table->string('article_title')->nullable()->comment('Title of the article');
+            $table->foreignId('author_id')->nullable()->references('id')->on('authors')->onDelete('cascade');
+            $table->string('phone_no')->nullable()->comment('Phone number of the corresponding author');
+            // $table->string('author_affiliation')->nullable()->comment('Affiliation of the corresponding author');
+            // $table->string('author_orcid_id')->nullable()->comment('ORCID ID of the corresponding author');
+            // $table->string('author_saspi_id')->nullable()->comment('SASPI ID of the corresponding author');
+            // $table->longText('co_author_data')->nullable()->comment('Name, email, phone number of co-authors');
+
+            // Cover Letter
+            // $table->string('cover_letter_name')->nullable()->comment('Name of the cover letter file');
+            // $table->string('cover_letter_type', 20)->nullable()->comment('File type of the cover letter');
+            // $table->string('cover_letter_url')->nullable()->comment('URL of the uploaded cover letter');
+            // $table->string('cover_letter_size')->nullable()->comment('Size of the cover letter file in bytes');
+
+            // First Page
+            // $table->string('first_page_name')->nullable()->comment('Name of the first page file');
+            // $table->string('first_page_type', 20)->nullable()->comment('File type of the first page');
+            // $table->string('first_page_url')->nullable()->comment('URL of the uploaded first page');
+            // $table->string('first_page_size')->nullable()->comment('Size of the first page file in bytes');
+
+            // Manuscript
+            // $table->string('script_name')->nullable()->comment('Name of the manuscript file');
+            // $table->string('script_type', 20)->nullable()->comment('File type of the manuscript');
+            // $table->string('script_url')->nullable()->comment('URL of the uploaded manuscript');
+            // $table->string('script_size')->nullable()->comment('Size of the manuscript file in bytes');
+
+            // Additional Documents
+            $table->longText('track_changes')->nullable()->comment('Manuscript file with track changes or highlighted changes');
+            $table->longText('icmje_declaration')->nullable()->comment('ICMJE Declaration file');
+            $table->longText('supplementary_files')->nullable()->comment('Additional supplementary files');
+
+            // Timestamps
+            $table->timestamps();
+        });
+
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('doc_submissions');
+    }
+};
