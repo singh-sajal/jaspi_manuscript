@@ -1,4 +1,4 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+<!-- <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
 
 <p align="center">
 <a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
@@ -61,4 +61,39 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT). -->
+
+
+# 📚 JASPI Manuscript Management System
+
+A Laravel-based web platform designed for doctoral candidates to submit research manuscripts and receive structured staff ratings based on predefined academic standards. Built for the Journal of Antimicrobial Stewardship Practices and Infectious Diseases (JASPI).
+
+---
+
+## 🔧 Tech Stack
+
+- **Backend:** Laravel 10, PHP 8+
+- **Frontend:** Blade, Bootstrap 5, jQuery
+- **Database:** MySQL
+- **Version Control:** Git, GitHub
+
+---
+
+## 🧩 Features
+
+- 📝 Manuscript submission with metadata & attachments  
+- ✅ Role-based login for Authors, Reviewers, and Admin  
+- ⭐ Reviewer ratings based on specific JASPI criteria  
+- 📊 Dashboard with submission and review tracking  
+- 🔒 Authentication, validation, and access control  
+- 📥 Downloadable reports and review summaries  
+- 🖼️ File upload with preview (PDF, DOCX, etc.)
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/YOUR_USERNAME/jaspi-manuscript-system.git
+cd jaspi-manuscript-system
