@@ -1,12 +1,17 @@
 # 📚 JASPI Manuscript Management System
 
 A Laravel-based web platform designed for doctoral candidates to submit research manuscripts and receive structured staff ratings based on predefined academic standards. Built for the Journal of Antimicrobial Stewardship Practices and Infectious Diseases (JASPI).
+---
+
+🌐 Live Preview [click here](https://manuscript.ilikasofttech.com/)
+
+🚀 [Visit the website (Local)](http://127.0.0.1:8000)
 
 ---
 
 ## 🔧 Tech Stack
 
-- **Backend:** Laravel 10, PHP 8+
+- **Backend:** Laravel 9, PHP 8+
 - **Frontend:** Blade, Bootstrap 5, jQuery
 - **Database:** MySQL
 - **Version Control:** Git, GitHub
