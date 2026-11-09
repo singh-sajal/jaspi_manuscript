@@ -10,7 +10,7 @@
 
                 {{-- Add the name and username into flex column the username a slight smaller --}}
                 <a class="d-flex flex-column" href="{{ route('admin.getAuthorProfile', $author->uuid) }}">
-                    <span class="text-dark fw-bold">{{ $author->name }}</span>
+                    <span class="text-dark fw-bold">{{ ($author->name. ' '. $author->lname) }}</span>
                     <span class="text-muted">{{ $author->username ?? '---' }}</span>
                 </a>
 

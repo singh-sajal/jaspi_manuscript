@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('file_size')->nullable();
             $table->string('file_url')->nullable();
             $table->string('attachment_type')->nullable();
+            $table->text('legend')->nullable();
             $table->timestamps();
         });
     }

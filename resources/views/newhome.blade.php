@@ -147,7 +147,7 @@
             align-items: center;
             justify-content: center;
         }
-*/
+        */
 
 
 
@@ -214,7 +214,7 @@
     <div class="particle" style="width: 20px; height: 20px; top: 50%; left: 50%; animation-delay: 6s;"></div>
 
     <div class="main-content">
-         <div class="d-flex align-items-center">
+        <div class="d-flex align-items-center">
             <div class="text-center text-md-start mb-5 mb-md-0 border-end px-4">
                 <h2 class="fw-bold">Welcome to Manuscript</h2>
                 <p class="text-muted mb-4">Please select your role to continue</p>

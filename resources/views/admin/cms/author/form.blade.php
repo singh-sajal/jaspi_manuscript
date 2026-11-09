@@ -2,11 +2,15 @@
 
     <div class="row">
         <div class="form-group col-md-6 my-2">
-            <label for="name" class="required">Name</label>
+            <label for="name" class="required">First Name</label>
             <input type="text" name="name" class="form-control" required value="{{ $author->name ?? '' }}">
         </div>
-
         <div class="form-group col-md-6 my-2">
+            <label for="lname" class="required">Last Name</label>
+            <input type="text" name="lname" class="form-control" required value="{{ $author->lname ?? '' }}">
+        </div>
+
+        <div class="form-group col-md-12 my-2">
             <label for="email" class="required">Email</label>
             <input type="email" name="email" class="form-control" required value="{{ $author->email ?? '' }}">
         </div>

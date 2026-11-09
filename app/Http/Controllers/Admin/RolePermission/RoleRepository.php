@@ -24,8 +24,9 @@ class RoleRepository
     public function index($request)
     {
 
-        $perPage = $request->perPage ?? 15;
-        $records = Role::where('name', '!=', 'superadmin')->with('permissions');
+        $perPage = $request->perPage ?? 50;
+        // $records = Role::where('name', '!=', 'superadmin')->with('permissions');
+        $records = Role::with('permissions');
         $this->search($request, $records);
         $this->sort($request, $records);
         $records = $records->paginate($perPage);
@@ -146,7 +147,7 @@ class RoleRepository
         if ($request->has('dev')) {
 
             if ($request->isMethod('get')) {
-                $perPage = $request->perPage ?? 15;
+                $perPage = $request->perPage ?? 50;
                 $records = Permission::query();
                 $this->search($request, $records);
                 $this->sort($request, $records);

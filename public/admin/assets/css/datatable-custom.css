@@ -1,0 +1,270 @@
+/* =====================================================
+   ULTRA CLEAN / MODERN DATATABLE UI (FINAL + WIDTH FIX)
+   ===================================================== */
+
+/* ------------------ COLOR SYSTEM ------------------ */
+:root {
+    --dt-primary-color: #88b4ee;
+    --dt-secondary-color: #475569;
+    --dt-border-color: #d7dbdf;
+    --dt-bg-light: #eaefff;
+    --dt-bg-white: #ffffff;
+    --dt-hover-bg: #f5f7fb;
+}
+
+.dropdown-menu {
+    z-index: 200;
+}
+
+/* ------------------ CONTAINER ------------------ */
+.dt-container-outer {
+    background: var(--dt-bg-white);
+    border-radius: 0px;
+    border: 1px solid var(--dt-border-color);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+/* ------------------ HEADER TOOLBAR ------------------ */
+.dt-header {
+    background: var(--dt-bg-light);
+    padding: 0.45rem 0.5rem;
+    border-bottom: 1px solid var(--dt-border-color);
+}
+
+/* ------------------ SCROLL AREA ------------------ */
+.dt-container-inner {
+    position: relative;
+    min-height: calc(100vh - 400px);
+    max-height: calc(100vh - 160px);
+    overflow: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--dt-border-color) transparent;
+}
+
+/* ------------------ TABLE BASE ------------------ */
+.dt-datatable {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: auto;
+    font-size: 12.5px;
+    color: #111827;
+}
+
+/* Default cells */
+.dt-datatable th,
+.dt-datatable td {
+    padding: 8px 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 320px;
+}
+
+/* ------------------ HEADER ------------------ */
+.dt-datatable thead th {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    background: var(--dt-bg-light) !important;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--dt-secondary-color);
+    border-bottom: 1px solid var(--dt-border-color);
+}
+
+/* ------------------ BODY ------------------ */
+.dt-datatable tbody td {
+    border-bottom: 1px solid var(--dt-border-color);
+}
+
+.dt-datatable tbody tr {
+    transition: background-color 0.12s ease;
+}
+
+.dt-datatable tbody tr:hover {
+    background-color: var(--dt-hover-bg);
+}
+
+/* ------------------ STICKY COLUMNS ------------------ */
+.dt-datatable th:first-child,
+.dt-datatable td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    background: var(--dt-bg-white);
+    box-shadow: inset -1px 0 0 var(--dt-border-color);
+}
+
+.dt-datatable th:last-child,
+.dt-datatable td:last-child {
+    position: sticky;
+    right: 0;
+    z-index: 10;
+    background: var(--dt-bg-white);
+    box-shadow: inset 1px 0 0 var(--dt-border-color);
+}
+
+.dt-datatable thead th:first-child,
+.dt-datatable thead th:last-child {
+    z-index: 20;
+}
+
+/* ------------------ SMALL / UTILITY COLUMNS ------------------ */
+/* Checkbox / icon / action columns */
+.dt-col-checkbox,
+.dt-col-actions,
+.dt-col-icon {
+    width: 40px;
+    min-width: 40px;
+    max-width: 40px;
+    text-align: center;
+    padding-left: 6px;
+    padding-right: 6px;
+}
+
+.dt-col-checkbox input {
+    margin: 0;
+    transform: scale(0.9);
+}
+
+/* ------------------ BUTTONS ------------------ */
+.dt-btn {
+    background: transparent;
+    border: 1px solid var(--dt-border-color) !important;
+    border-radius: 8px;
+    padding: 5px 9px;
+    font-size: 11.5px;
+    color: var(--dt-secondary-color);
+    transition: all 0.15s ease;
+}
+
+.dt-btn:hover {
+    background: var(--dt-primary-color);
+    border-color: var(--dt-primary-color);
+    color: #ffffff;
+}
+
+/* ------------------ SORT ICON ------------------ */
+.dt-sort-icon-btn {
+    width: 14px;
+    height: 14px;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ------------------ SEARCH ------------------ */
+.dt-search-container {
+    display: flex;
+    align-items: center;
+}
+
+.dt-search-input {
+    min-width: 220px;
+    padding: 5px 9px;
+    font-size: 11.5px;
+    border-radius: 10px;
+    border: 1px solid var(--dt-border-color) !important;
+    background: #ffffff;
+}
+
+.dt-search-input:focus {
+    outline: none;
+    border-color: var(--dt-primary-color);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+}
+
+/* ------------------ PAGINATION / INFO ------------------ */
+.dt-pagination-info {
+    font-size: 11.5px;
+    color: var(--dt-secondary-color);
+    padding: 5px 10px;
+}
+
+/* ------------------ STATUS BAR ------------------ */
+.dt-status-bar {
+    background: var(--dt-bg-light);
+    border-top: 1px solid var(--dt-border-color);
+    padding: 0.45rem 10px;
+    font-size: 11.5px;
+    color: var(--dt-secondary-color);
+}
+
+.dt-status-bar p {
+    margin: 0;
+}
+
+/* ------------------ DROPDOWN ------------------ */
+.dt-dropdown-item {
+    font-size: 11.5px;
+}
+
+.dt-dropdown-item:hover {
+    background-color: var(--dt-primary-color);
+    color: #ffffff;
+}
+
+/* ------------------ LOADING ------------------ */
+.dt-loading-screen {
+    position: absolute;
+    inset: 0;
+    background: rgba(249, 250, 251, 0.85);
+    backdrop-filter: blur(3px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dt-spinner {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 3px solid #e5e7eb;
+    border-top-color: var(--dt-primary-color);
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ------------------ CHECKBOX ------------------ */
+.dt-checkbox {
+    accent-color: var(--dt-primary-color);
+}
+
+/* ================================
+   COLUMN RESIZE (ONLY)
+   ================================ */
+
+/* th must be relative */
+.dt-datatable thead th {
+    position: sticky;
+}
+
+/* resize handle */
+.dt-col-resize-handle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 6px;
+    height: 100%;
+    cursor: col-resize;
+    user-select: none;
+}
+
+/* hover hint */
+.dt-datatable thead th:hover .dt-col-resize-handle {
+    background: rgba(79, 70, 229, 0.15);
+}
+
+/* while dragging */
+body.dt-resizing {
+    cursor: col-resize;
+}

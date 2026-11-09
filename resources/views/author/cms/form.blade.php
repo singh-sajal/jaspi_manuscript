@@ -71,9 +71,10 @@
                                placeholder="Enter ORCID ID" required value="{{ $app_info->author_orcid_id ?? '' }}">
                        </div>
                        <div class="mb-3">
-                           <label for="author_saspi_id" class="form-label">SASPI ID</label>
+                           <label for="author_saspi_id" class="form-label">SASPI Membership Number</label>
                            <input type="text" class="form-control" id="author_saspi_id" name="author_saspi_id"
-                               placeholder="Enter SASPI ID" value="{{ $app_info->author_saspi_id ?? '' }}">
+                               placeholder="Enter SASPI Membership Number"
+                               value="{{ $app_info->author_saspi_id ?? '' }}">
                        </div>
                    </div>
                </div>
@@ -88,7 +89,7 @@
                            data-error-message="At least one option is required" style="display:none">
                        @foreach ($articles as $index => $article)
                            <div class="col form-check mb-2">
-                               <input class="form-check-input article-checkbox" type="checkbox" name="article_type[]"
+                               <input class="form-check-input article-checkbox" type="radio" name="article_type[]"
                                    value='{{ $article }}' id='article_{{ $index }}'
                                    {{ in_array($article, $savedArticles) ? 'checked' : '' }}
                                    onchange="toggleRequired()">
@@ -135,8 +136,6 @@
        </div>
 
        <div class="col-12 mb-3">
-
-
            <label for="description" class="form-label">Description</label>
            <div id="editor" style="height:230px !important;">
                {!! $app_info->description ?? '' !!}

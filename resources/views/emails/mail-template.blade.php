@@ -4,64 +4,67 @@
     <meta charset="UTF-8">
     <title>Mail View</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <style>
         body {
             background-color: #f4f6f8;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
         }
 
         .mail-container {
-            max-width: 70%;
-            margin: 50px auto;
+            max-width: 600px; /* Using fixed px is safer for email clients than % */
+            margin: 20px auto;
             background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
             overflow: hidden;
-            padding: 30px 40px;
+            padding: 30px;
         }
 
         .mail-header {
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 20px;
             margin-bottom: 20px;
         }
 
-        .subject {
-            font-size: 1.7rem;
-            font-weight: 600;
-            color: #343a40;
-        }
-
-        .sender-details {
-            margin-top: 10px;
+        /* Table used for guaranteed alignment in Outlook/Gmail */
+        .meta-table {
+            width: 100%;
+            border-collapse: collapse;
             font-size: 0.95rem;
-            color: #6c757d;
         }
 
-        .sender-name {
-            font-weight: 500;
+        .meta-table th {
+            text-align: left;
+            color: #6c757d;
+            font-weight: 600;
+            padding: 4px 15px 4px 0;
+            width: 80px;
+            vertical-align: top;
+        }
+
+        .meta-table td {
             color: #212529;
+            padding: 4px 0;
+        }
+
+        .subject-row td {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #0f172a;
+            padding-top: 10px;
+        }
+
+        .subject-row th {
+            padding-top: 10px;
         }
 
         .message-body {
-            margin-top: 30px;
             font-size: 1.05rem;
             line-height: 1.6;
-            color: #495057;
+            color: #334155;
             white-space: pre-wrap;
-        }
-
-        .mail-footer {
-            margin-top: 40px;
-            text-align: right;
-        }
-
-        .action-btn {
-            border-radius: 30px;
-            padding: 8px 22px;
         }
     </style>
 </head>
@@ -69,20 +72,28 @@
 
     <div class="mail-container">
         <div class="mail-header">
-            <div class="subject">{{ $data['subject'] }}</div>
-            <div class="sender-details">
-                <span class="sender-name">{{ $data['sender_name'] ?? 'Admin' }}</span>
-                &nbsp;&lt;{{ $data['sender_email'] ?? 'admin@example.com' }}&gt;
-            </div>
+            <table class="meta-table">
+                <tr>
+                    <th>From:</th>
+                    <td><strong>{{ $data['sender_name'] ?? 'System' }}</strong> &lt;{{ $data['sender_email'] ?? '' }}&gt;</td>
+                </tr>
+                <tr>
+                    <th>To:</th>
+                    <td>{{ $data['to_email'] ?? 'Recipient' }}</td>
+                </tr>
+                <tr>
+                    <th>Date:</th>
+                    <td>{{ $data['date'] ?? '' }}</td>
+                </tr>
+                <tr class="subject-row">
+                    <th>Subject:</th>
+                    <td>{{ $data['subject'] ?? 'No Subject' }}</td>
+                </tr>
+            </table>
         </div>
 
         <div class="message-body">
-            {!! nl2br(e($data['message'])) !!}
-        </div>
-
-        <div class="mail-footer">
-            <button class="btn btn-outline-primary action-btn">Reply</button>
-            <button class="btn btn-outline-secondary action-btn">Forward</button>
+            {!! nl2br(e($data['message'] ?? '')) !!}
         </div>
     </div>
 

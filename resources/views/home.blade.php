@@ -279,6 +279,12 @@
                                     About the Journal
                                 </a>
                             </li>
+                            {{-- <li class="mb-2">
+                                <i class="ri-information-line me-2 text-primary"></i>
+                                <a href="{{ route('published-manuscript') }}" class="text-decoration-none  text-muted  fw-medium">
+                                    Published Scripts
+                                </a>
+                            </li> --}}
                         </ul>
                     </div>
 
@@ -309,7 +315,7 @@
                         <div class="mb-3">
                             <div class="input-group">
                                 <i class="fas fa-user"></i>
-                                <input type="text" name="username" required class="form-control"
+                                <input type="email" name="username" required class="form-control"
                                     placeholder="User Email Id">
                             </div>
                             <span class="text-danger" data-error="username"></span>
@@ -349,10 +355,17 @@
 
                 </div>
 
-                <!-- Register Link -->
-                <div class="mt-5">
-                    <a href="{{ route('author.userCheck') }}" class="btn btn-outline-secondary w-100">Register as an
-                        Author</a>
+                <div class="d-flex justify-content-between gap-3">
+                    <!-- Register Link -->
+                    <div class="mt-5">
+                        <a href="{{ route('admin.userCheck') }}" class="btn btn-outline-secondary w-100">Register as Reviewer</a>
+                    </div>
+                    <!-- Register Link -->
+                    <div class="mt-5">
+                        <a href="{{ route('author.userCheck') }}" class="btn btn-outline-secondary w-100">Register as
+                            an
+                            Author</a>
+                    </div>
                 </div>
                 {{-- <div class="mt-4">
                     <div id="quoteBox" class="quote-section">
@@ -407,16 +420,17 @@
             }
         });
 
-    //     // Toggle password visibility
-    //     const togglePassword = document.getElementById('password-addon');
-    //     const passwordInput = document.getElementById('password-input');
-    //     togglePassword.addEventListener('click', function() {
-    //         const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-    //         passwordInput.setAttribute('type', type);
-    //         this.querySelector('i').classList.toggle('ri-eye-fill');
-    //         this.querySelector('i').classList.toggle('ri-eye-off-fill');
-    //     });
-    // </script>
+        //     // Toggle password visibility
+        //     const togglePassword = document.getElementById('password-addon');
+        //     const passwordInput = document.getElementById('password-input');
+        //     togglePassword.addEventListener('click', function() {
+        //         const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        //         passwordInput.setAttribute('type', type);
+        //         this.querySelector('i').classList.toggle('ri-eye-fill');
+        //         this.querySelector('i').classList.toggle('ri-eye-off-fill');
+        //     });
+        //
+    </script>
 </body>
 
 </html>

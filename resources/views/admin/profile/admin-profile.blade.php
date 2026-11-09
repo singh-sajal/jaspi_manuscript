@@ -130,12 +130,12 @@
                         <div class="card-body">
                             @include('admin.profile.form')
                         </div>
-                        {{-- <div class="card-footer d-flex justify-content-between align-items-center">
-                            <p class="flex-grow-1 mb-0">Want to change your password ? <a href="#"
+                        <div class="card-footer d-flex justify-content-between align-items-center">
+                            {{-- <p class="flex-grow-1 mb-0">Want to change your password ? <a href="#"
                                     class="actionHandler" data-url="{{ route('admin.password.update') }}"
-                                    class="link-primary">Click Here</a></p>
+                                    class="link-primary">Click Here</a></p> --}}
                             <button type="submit" class="btn btn-sm btn-primary">Update</button>
-                        </div> --}}
+                        </div>
                     </form>
 
                 </div>
@@ -147,4 +147,17 @@
 @endsection
 @section('javascripts')
     <script src="{{ asset('engines/profile-module.js') }}"></script>
+    <script>
+        $(function() {
+            var $group = $('#membershipIdGroup');
+            $('input[name="saspi_member"]').on('change', function() {
+                if ($(this).val() === 'Yes') {
+                    $group.show();
+                } else {
+                    $group.hide();
+                    $group.find('input').val('');
+                }
+            });
+        });
+    </script>
 @endsection

@@ -1,0 +1,121 @@
+= PENDING MANUSCRIPTS FEATURE ================================
+Status: IMPLEMENTED (pending later refinements)
+Date started: 22-Sep-2026
+
+------------------------------------------------------------------
+WHAT IT DOES
+------------------------------------------------------------------
+Adds a "Pending" section in the admin sidebar Manuscript dropdown that
+shows the launched-in admin staff member's OWN actionable queue (manuscripts
+where that user still has an action button available), plus it shows only the
+chief-decision queue for superadmins.
+
+- List page:  ?type=pending on the normal manuscript index
+              (route: admin.application.index, type=pending)
+- Count badge: shown next to "Pending" in the sidebar, always in sync with the
+              list (both reuse the same scopePendingFor query).
+
+------------------------------------------------------------------
+FILES CHANGED
+------------------------------------------------------------------
+1. app/Models/Application.php
+   -> scopePendingFor($query, $admin) - the single source of truth for what
+      counts as "pending" for a given logged-in admin staff member.
+
+2. app/Http/Controllers/Admin/Application/ApplicationRepository.php
+   -> index(): new else-if branch for $request->type === 'pending'.
+   -> pending_index($request): mirrors index() (perPage, search, sort,
+      paginate) but uses Application::query()->pendingFor(authUser('admin')).
+      Reuses the SAME datatable/view as the normal "All Manuscripts" tab
+      (admin.application.datatable + admin.application.index).
+
+3. app/helpers.php
+   -> manuscriptCounts(): added 'pending' key = Application::query()
+      ->pendingFor(authUser('admin'))->count(). Used by the sidebar badge.
+
+4. resources/views/admin/sidebar.blade.php
+   -> Added "Pending" <li> as the FIRST item inside the Manuscript dropdown
+      (above "All Manuscripts"), with the menu-count badge.
+
+------------------------------------------------------------------
+WHAT COUNTS AS "PENDING" (scopePendingFor logic)
+------------------------------------------------------------------
+Base: status NOT IN (incomplete, published, rejected, withdrawn)
+
+Visibility scoping (same as the normal index):
+  - external reviewer  -> where assigned_to_ex_id = me
+  - non-admin staff    -> assigned_to_id = me OR timelines.assigned_to_id = me
+  - admins (is_admin=1)-> no scope restriction (see everything)
+
+SUPERADMIN (role 'superadmin', i.e. chief / Editor-in-chief):
+  -> ONLY chief decisions pending:
+       status IN (editor-accepts, editor-rejects, editor-revise)
+       AND data->status == 'sended to chief approval'
+     (i.e. assistant editor already sent it for final approval, chief has NOT
+      yet responded. After chief responds the data->status becomes
+      'redirected to assistant editor', so the manuscript drops out.)
+
+EVERYONE ELSE (staff / non-superadmin admins) - any of these:
+  Handling editor (me = "processing" timeline assigned_to_id):
+    - status=processing  AND data->handling_editor_decision IS NULL
+                         (-> Accept/Reject assignment pending)
+    - status=processing  AND data->handling_editor_decision = 1
+                         (-> "Make a decision" pending)
+    - status IN (assigning reviewers, under review, re-review)
+                         (-> Edit decision / remind reviewers)
+    - status=reviewed    (-> editor final accept/revise/reject + re-review)
+  Internal reviewer (rev_type=internal, assigned_to_id = me):
+    - status IN (assigning reviewers, re-review) AND accept_in IS NULL
+                         (-> Accept/Deny pending)
+    - status IN (assigning reviewers, under review, re-review)
+      AND accept_in=1 AND (status_ex IS NULL OR status_ex NOT IN (1,3))
+                         (-> Score pending)
+  External reviewer (rev_type=external, assigned_to_ex_id = me):
+    - status IN (assigning reviewers, re-review) AND accept_ex IS NULL
+                         (-> Accept/Deny pending)
+    - status IN (assigning reviewers, under review, re-review)
+      AND accept_ex=1 AND (status_ex IS NULL OR status_ex NOT IN (2,3))
+                         (-> Score pending)
+  Permission-driven actions:
+    - can application.techEditorDecision         -> status IN (submitted,
+      resubmitted) AND NO "technical checks approved" timeline
+    - can application.assistantEditorFinalDecision -> status IN (editor-accepts,
+      editor-rejects) AND data->status='redirected to assistant editor', OR
+      status=editor-revise
+    - can application.assistantToChiefForApproval -> status IN (editor-accepts,
+      editor-rejects) AND (data->status IS NULL OR NOT IN (sended to chief
+      approval, redirected to assistant editor))
+    - can application.chiefToAssistanResponse     -> status IN (editor-accepts,
+      editor-rejects) AND data->status='sended to chief approval'
+    - can application.publish                     -> status=accepted AND
+      "accepted" timeline assigned_to_id = me
+    - can application.add_doi                      -> published_doi IS NULL AND
+      an "accepted" timeline exists
+
+------------------------------------------------------------------
+VERIFIED (tinker, 22-Sep-2026)
+------------------------------------------------------------------
+  - Admins 1 & 23 (superadmin/chief): pending = 0 because NO manuscript is
+    currently in editor-accepts/editor-rejects/editor-revise (verified with
+    direct query). When such manuscripts are "sended to chief approval", they
+    will appear here.
+  - Assistant Editor (33): handling-editor + tech/assistant actions.
+  - Technical Editor (34): submitted/resubmitted without tech approval.
+  - Internal reviewers: accept/deny + score queues correct.
+  - External reviewers & users with no pending tasks: 0 (correct).
+
+------------------------------------------------------------------
+POSTPONED / OPEN ITEMS TO CONTINUE LATER
+------------------------------------------------------------------
+[ ] Decide handling for is_admin=1 users who are NOT superadmin role
+    (currently Assistant Editor 33 / Technical Editor 34): they now get the
+    personal actionable queue (handling editor + permissions). Confirm this is
+    desired vs. giving them the chief queue too.
+[ ] The pending datatable reuses the "All Manuscripts" datatable which renders
+    per-user action buttons - good. Optionally add a dedicated pending
+    datatable/column to emphasize WHY each row is pending (status badge exists).
+[ ] Consider adding pending count also as notification badge in the topbar
+    (out of scope, not requested).
+[ ] Remember: if the DB ever contains editor-accepts/editor-rejects/editor-revise
+    books without a data->status, they will NOT appear for the superadmin
+    (correct - not the chief's turn yet) - they appear for the assistant editor.

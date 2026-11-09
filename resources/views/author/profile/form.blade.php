@@ -1,7 +1,11 @@
 <div class="row mt-4">
-    <div class="col-12 mb-3">
-        <label class="form-label required">Name</label>
+    <div class="col-12 col-md-6 mb-3">
+        <label class="form-label required">First Name</label>
         <input type="text" class="form-control" required name="name" value="{{ $author->name ?? '' }}">
+    </div>
+    <div class="col-12 col-md-6 mb-3">
+        <label class="form-label required">Last Name</label>
+        <input type="text" class="form-control" required name="lname" value="{{ $author->lname ?? '' }}">
     </div>
     <div class="col-12 col-md-6 mb-3">
         <label class="form-label required">Email</label>

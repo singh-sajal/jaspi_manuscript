@@ -10,6 +10,7 @@
                 'id' => $id ?? 'na',
                 'type' => $type,
                 'app_id' => $app_id,
+                'legend' => $legend,
             ]) }}"
             method="post" enctype="multipart/form-data">
             @csrf
@@ -20,11 +21,24 @@
                         <label for="file_upload "
                             class="form-label {{ $type !== 'Supplimentry File' ? 'required' : '' }}">Upload File :
                             {{ $type ?? '' }}</label>
-                        <input type="file" name="file_upload" id="file_upload" class="form-control"
-                            {{ $type !== 'Supplimentry File' ? 'required' : '' }} accept=".pdf" data-max-size="10240"
-                            data-file-types="pdf">
+                        @if ($type == 'Upload ICMJE Declaration')
+                            <input type="file" name="file_upload" id="file_upload" class="form-control"
+                                {{ $type !== 'Supplimentry File' ? 'required' : '' }} accept=".pdf"
+                                data-max-size="10240" data-file-types="pdf">
+                        @elseif ($type == 'Upload Manuscript')
+                            <input type="file" name="file_upload" id="file_upload" class="form-control"
+                                {{ $type !== 'Supplimentry File' ? 'required' : '' }} accept=".docx"
+                                data-max-size="10240" data-file-types="docx">
+                        @else
+                            <input type="file" name="file_upload" id="file_upload" class="form-control"
+                                {{ $type !== 'Supplimentry File' ? 'required' : '' }} accept=".pdf,.docx,.doc"
+                                data-max-size="10240" data-file-types="pdf,docx">
+                        @endif
                     </div>
                     <span class="text-danger" data-error="file_upload"></span>
+                    <input type="text" name="legend" id="legend" class="form-control mt-3" placeholder="Legend"
+                        value="{{ $legend == 'na' ? '' : $legend }}">
+
                 </div>
 
             </div>

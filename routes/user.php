@@ -12,7 +12,7 @@ Route::middleware(['guest:web'])->group(function () {
 
 
 // // Authenticated and protectd routes
-Route::middleware(['revalidateSession', 'auth:web'])->group(function () {
+Route::middleware(['revalidateSession', 'auth:web', 'active.account'])->group(function () {
     Route::get('logout', [UserAuthController::class, 'logout'])->name('logout');
     Route::get('dashboard', function () {
         return "Hii Welcome" . auth()->user()->name;

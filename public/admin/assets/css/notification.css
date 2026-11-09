@@ -1,0 +1,208 @@
+.notification_dropdown .nav-link {
+    position: relative;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -2px;
+    right: -5px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 9px;
+    background: #dc3545;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 18px;
+    text-align: center;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
+}
+
+.notification-dropdown-menu {
+    width: 390px;
+    max-width: calc(100vw - 24px);
+    padding: 0;
+    border: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.14);
+}
+
+.notification-dropdown-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    background: #fff;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.notification-dropdown-body {
+    max-height: 420px;
+    overflow-y: auto;
+    background: #fff;
+}
+
+.notification-dropdown-item {
+    position: relative;
+    display: flex;
+    gap: 12px;
+    padding: 12px 16px;
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid #f5f5f5;
+    transition: background 0.15s ease;
+}
+
+.notification-dropdown-item:last-child {
+    border-bottom: 0;
+}
+
+.notification-dropdown-item:hover {
+    color: inherit;
+    background: #f8f9fa;
+}
+
+.notification-dropdown-item.is-unread {
+    background: rgba(196, 90, 17, 0.05);
+}
+
+.notification-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 38px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    font-size: 18px;
+}
+
+.notification-content {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 2px;
+    padding-right: 10px;
+}
+
+.notification-title {
+    display: block;
+    color: #212529;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.notification-message {
+    display: -webkit-box;
+    overflow: hidden;
+    color: #6c757d;
+    font-size: 12px;
+    line-height: 1.4;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.notification-time {
+    color: #adb5bd;
+    font-size: 11px;
+}
+
+.notification-dot {
+    position: absolute;
+    top: 16px;
+    right: 14px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--primary, #c45a11);
+}
+
+.notification-dropdown-footer {
+    padding: 10px 16px;
+    background: #fff;
+    border-top: 1px solid #f0f0f0;
+    text-align: center;
+}
+
+.notification-dropdown-footer a {
+    color: var(--primary, #c45a11);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.notification-empty {
+    padding: 28px 16px;
+    color: #8a8f98;
+    text-align: center;
+}
+
+.notification-empty i {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 28px;
+}
+
+.notification-page-item {
+    display: flex;
+    gap: 14px;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.notification-page-item:last-child {
+    border-bottom: 0;
+}
+
+.notification-page-item.is-unread {
+    background: rgba(196, 90, 17, 0.04);
+}
+
+.notification-page-item .notification-icon {
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+}
+
+.notification-page-item .notification-title {
+    color: #212529;
+    font-size: 15px;
+}
+
+.notification-page-item .notification-title:hover {
+    color: var(--primary, #c45a11);
+}
+
+.notification-page-item .notification-message {
+    display: block;
+    overflow: visible;
+    color: #6c757d;
+    font-size: 13px;
+    line-height: 1.5;
+    -webkit-line-clamp: unset;
+}
+
+.notification-page-actions {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 8px;
+    align-items: flex-start;
+}
+
+@media (max-width: 575.98px) {
+    .notification-dropdown-menu {
+        width: calc(100vw - 24px);
+    }
+
+    .notification-page-item {
+        padding: 14px;
+    }
+
+    .notification-page-actions {
+        flex-direction: column;
+    }
+}

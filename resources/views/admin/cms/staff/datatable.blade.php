@@ -18,8 +18,13 @@
         </td>
 
         <td>
-            {{ $record->getRoleNames()->isNotEmpty() ? implode(', ', $record->getRoleNames()->toArray()) : '--' }}
-
+            @php
+                $roles = collect($record->getRoleNames())
+                    ->map(fn($role) => Str::title(str_replace('-', ' ', $role)))
+                    ->filter()
+                    ->implode(', ');
+            @endphp
+            {{ $roles ?: '--' }}
         </td>
 
         <td>
@@ -59,17 +64,22 @@
             <div class="btn-group">
 
                 @can('staff.update')
-                    <button class="btn btn-sm btn-secondary btn-label actionHandler"
-                        data-url="{{ route('admin.staff.edit', $record->uuid) }}">
-                        <i class="ri-edit-box-line"></i>
-                    </button>
+                    {{-- @if ($record->is_admin != '1') --}}
+                        <button class="btn btn-sm btn-secondary btn-label actionHandler"
+                            data-url="{{ route('admin.staff.edit', $record->uuid) }}">
+                            <i class="ri-edit-box-line"></i>
+                        </button>
+                    {{-- @endif --}}
                 @endcan
                 @can('staff.delete')
-                    <button class="btn btn-sm btn-danger actionHandler" data-action="delete"
-                        data-url="{{ route('admin.staff.destroy', $record->uuid) }}"> <i
-                            class="ri-delete-bin-line"></i></button>
+                    {{-- @if ($record->is_admin != '1') --}}
+                        <button class="btn btn-sm btn-danger actionHandler" data-action="delete"
+                            data-url="{{ route('admin.staff.destroy', $record->uuid) }}"> <i
+                                class="ri-delete-bin-line"></i></button>
+                    {{-- @endif --}}
                 @endcan
                 @can('staff.generate-credentials')
+                    {{-- @if ($record->password != null && $record->is_admin != '1') --}}
                     @if ($record->password != null)
                         <button class="btn btn-sm btn-info actionHandler"
                             data-url="{{ route('admin.staff.generateCredentials', $record->uuid) }}">

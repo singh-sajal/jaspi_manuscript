@@ -1,13 +1,18 @@
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    let monthlyChartInstance;
+
+    function renderMonthlyChart(labels, data) {
         const ctx = document.getElementById("monthlyApplicationChart").getContext("2d");
-        new Chart(ctx, {
+        if (monthlyChartInstance) {
+            monthlyChartInstance.destroy();
+        }
+        monthlyChartInstance = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: @json($charts['monthlyApplicationChart']['labels']),
+                labels: labels,
                 datasets: [{
-                    label: 'Applications per Month',
-                    data: @json($charts['monthlyApplicationChart']['data']),
+                    label: 'Manuscripts per Month',
+                    data: data,
                     backgroundColor: '#ff9f00'
                 }]
             },
@@ -16,15 +21,31 @@
                 maintainAspectRatio: false,
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        ticks: { stepSize: 1, precision: 0 }
                     }
                 },
                 plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
+                    legend: { position: 'bottom' }
                 }
             }
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMonthlyChart(
+            @json($charts['monthlyApplicationChart']['labels']),
+            @json($charts['monthlyApplicationChart']['data'])
+        );
+
+        const yearSelect = document.getElementById('monthlyChartYear');
+        console.log('monthlyChartYear element:', yearSelect); // remove after confirming it works
+
+        yearSelect?.addEventListener('change', function() {
+            fetch(`{{ route('admin.dashboard.monthly-chart') }}?year=${this.value}`)
+                .then(res => res.json())
+                .then(json => renderMonthlyChart(json.labels, json.data))
+                .catch(err => console.error('Monthly chart fetch failed:', err));
         });
     });
 </script>

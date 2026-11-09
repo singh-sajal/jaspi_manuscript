@@ -24,4 +24,9 @@ class ApplicationTimeline extends Model
     {
         return $this->belongsTo(Admin::class, 'assigned_to_id', 'id');
     }
+
+    public function assignedBy()
+    {
+        return $this->belongsTo(Admin::class, 'assigned_by', 'id');
+    }
 }

@@ -21,14 +21,15 @@ class AuthorAuthRequest extends FormRequest
             return [];
         } else {
             return [
-                'email' => 'nullable|email',
+                'username' => 'required|email',
                 // 'contactperson' => 'required|max:255|min:2',
                 // 'phone' => 'nullable|numeric',
                 // 'state' => 'required',
                 // 'name' => 'required|unique:organizations,name|max:255|regex:/^[A-Za-z0-9\s]+$/',
                 // 'address' => 'nullable|max:255',
                 // 'loginemail' => 'required|email|regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/|unique:users,email',
-                'password' => 'required|max:20|regex:/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/',
+                // 'password' => 'required|max:20|regex:/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/',
+                'password' => 'required|max:20',
             ];
         }
     }

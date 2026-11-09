@@ -1,0 +1,160 @@
+================================================================================
+JASPI MANUSCRIPT MANAGEMENT SYSTEM
+AUTOMATED EMAIL NOTIFICATIONS - OVERVIEW FOR CLIENTS
+================================================================================
+
+The system automatically sends the following email notifications at each stage
+of the manuscript workflow. Emails are sent to the persons noted below as soon
+as the relevant action is completed in the system.
+
+--------------------------------------------------------------------------------
+1. MANUSCRIPT SUBMISSION
+--------------------------------------------------------------------------------
+Email        : Manuscript Submission Confirmation
+Sent when    : Author submits a new manuscript
+Recipient    : Author
+CC           : Editorial office, Technical editor
+Manuscript   : Submitted
+
+--------------------------------------------------------------------------------
+2. TECHNICAL CHECK (TECHNICAL EDITOR)
+--------------------------------------------------------------------------------
+Email        : New Manuscript Assigned to You
+Sent when    : Technical editor accepts the manuscript / marks it out of scope
+Recipient    : Assistant editor
+Status       : Technical checks approved / Out of scope
+
+Email        : Your Manuscript Requires Revision
+Sent when    : Technical editor requests revision from the author
+Recipient    : Author
+Status       : Revision required (technical check)
+
+--------------------------------------------------------------------------------
+3. HANDLING EDITOR ASSIGNMENT
+--------------------------------------------------------------------------------
+Email        : New Manuscript Assigned to You
+Sent when    : Handling editor is assigned to the manuscript
+Recipient    : Assigned handling editor
+CC           : Editorial office
+Status       : Processing (with editor)
+
+Email        : Handling Editor Declined Assignment
+Sent when    : Handling editor declines the assignment
+Recipient    : The administrator who assigned the editor
+Status       : No change (new editor will be assigned)
+
+--------------------------------------------------------------------------------
+4. PEER REVIEW
+--------------------------------------------------------------------------------
+Email        : Invitation to Join as a Peer Reviewer
+Sent when    : A new external reviewer is invited to the journal
+Recipient    : Invited reviewer
+Status       : No change
+
+Email        : Reviewer Assignment Notification
+Sent when    : A manuscript is assigned to a reviewer
+Recipient    : Assigned reviewer
+Status       : Assigning reviewers / Under review / Re-review
+
+Email        : Reviewer Reminder
+Sent when    : A reminder is sent for a pending review
+Recipient    : Assigned reviewer
+CC           : Editorial coordinator (Akanksha)
+Status       : No change
+
+Email        : Reviewer Declined Assignment
+Sent when    : A reviewer declines their assignment
+Recipient    : Handling editor
+Status       : No change (replacement reviewer will be assigned)
+
+Email        : Review Submitted
+Sent when    : A reviewer submits their review
+Recipient    : Handling editor
+Status       : Reviewed (once all reviewers have submitted)
+
+--------------------------------------------------------------------------------
+5. HANDLING EDITOR'S DECISION
+--------------------------------------------------------------------------------
+Email        : Handling Editor Final Decision
+Sent when    : Handling editor accepts / requests revision / rejects
+Recipient    : The administrator who assigned the editor
+Status       : Editor accepted / Editor requested revision / Editor rejected
+
+--------------------------------------------------------------------------------
+6. CHIEF'S APPROVAL
+--------------------------------------------------------------------------------
+Email        : Final Approval Request
+Sent when    : Assistant editor requests the chief's final approval
+Recipient    : Chief (super admin)
+Status       : No change (approval requested)
+
+Email        : Chief's Decision
+Sent when    : Chief responds to the approval request
+Recipient    : The administrator who requested approval
+Status       : No change (final decision is recorded separately)
+
+--------------------------------------------------------------------------------
+7. FINAL DECISION (DEPARTMENT / REQUESTER)
+--------------------------------------------------------------------------------
+Email        : Final Decision on Your Manuscript
+Sent when    : Manuscript is accepted / rejected / revision requested
+Recipient    : Author
+Status       : Accepted / Rejected / Revision required
+
+Email        : Accepted Manuscript for Technical Processing
+Sent when    : Manuscript is accepted (sent for further processing)
+Recipient    : Technical editor
+Status       : Accepted
+
+--------------------------------------------------------------------------------
+8. PUBLISHING PROCESS
+--------------------------------------------------------------------------------
+Email        : New Manuscript Assigned to You for Publishing
+Sent when    : Publisher is assigned to format the manuscript
+Recipient    : Assigned publisher
+Status       : Accepted (sent for formatting)
+
+Email        : Formatted Proof Ready for Review
+Sent when    : Publisher uploads the formatted proof
+Recipient    : Technical editor
+Status       : Typesetting review
+
+Email        : Manuscript Proofreading Required
+Sent when    : Manuscript is sent to the author for proofreading
+Recipient    : Author
+Status       : With author for proofreading
+
+Email        : Author Corrected Proof Submitted
+Sent when    : Author uploads the corrected proof
+Recipient    : Assigned publisher
+Status       : Author corrections submitted
+
+--------------------------------------------------------------------------------
+9. PUBLICATION
+--------------------------------------------------------------------------------
+Email        : Your Manuscript is Published
+Sent when    : Manuscript is published (standard or direct publication)
+Recipient    : Author (includes the assigned DOI)
+Status       : Published
+
+--------------------------------------------------------------------------------
+10. ACCOUNT & MISCELLANEOUS EMAILS
+--------------------------------------------------------------------------------
+Email        : Your OTP Code
+Sent when    : Admin or author requests an OTP during login
+Recipient    : The requesting email
+
+Email        : Your Account Credentials - Welcome to JASPI
+Sent when    : A new staff account is created
+Recipient    : New staff member
+
+Email        : Your Account Has Been Activated
+Sent when    : A staff account is activated
+Recipient    : Staff member
+
+Email        : Admin / Author Message
+Sent when    : A message is sent from the system's mail module
+Recipient    : Selected recipient
+CC           : Editorial coordinator (Akanksha)
+
+================================================================================

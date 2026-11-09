@@ -18,6 +18,7 @@ return new class extends Migration
             $table->uuid('uuid');
             $table->foreignId('application_id')->nullable()->references('id')->on('applications')->onDelete('cascade');
             $table->string('status')->nullable();
+            $table->tinyInteger('is_visible_to_author')->nullable();
             $table->foreignId('assigned_to_id')->nullable()->references('id')->on('admins')->onDelete('set null');
             $table->longText('remark')->nullable();
             $table->longText('data')->nullable();

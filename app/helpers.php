@@ -66,7 +66,7 @@ if (!function_exists('getPaginationInfo')) {
             'from' => $data->firstItem() ?? 0,
             'to' => $data->lastItem() ?? 0,
             'total' => $data->total(),
-            'perPage' => $data->perPage() ?? 15,
+            'perPage' => $data->perPage() ?? 50,
             'previousPageUrl' => $data->previousPageUrl() ?? null,
             'nextPageUrl' => $data->nextPageUrl() ?? null,
             'hasPreviousPage' => $data->currentPage() > 1,
@@ -127,6 +127,146 @@ if (!function_exists('canAccess')) {
             }
             return $can_access_manu;
         }
+    }
+}
+
+// Counting manuscripts per status (mirrors the application index visibility rules)
+if (!function_exists('manuscriptCounts')) {
+    function manuscriptCounts()
+    {
+        $user = authUser('admin');
+
+        $isStaff = $user && $user->is_admin == 0;
+
+        $query = \App\Models\Application::query()->selectRaw('status, COUNT(*) as total')->groupBy('status');
+
+        if ($isStaff) {
+            // Same rule as the list scopes so the sidebar badge and the list
+            // can never disagree.
+            $query->involvedWith($user);
+        }
+
+        $counts = $query->pluck('total', 'status')->map(fn ($total) => (int) $total);
+
+        $excluded = collect(['incomplete', 'published', 'rejected', 'withdrawn', 'duplicate']);
+
+        // Mirrors ApplicationRepository::index(): acceptance ends a handling
+        // editor's / reviewer's active work before the manuscript is published.
+        if ($isStaff) {
+            $excluded = $excluded->merge(['pre-accepted', 'accepted']);
+        }
+
+        $all = $isStaff
+            ? \App\Models\Application::query()->activeFor($user)->count()
+            : $counts->reject(fn ($total, $status) => $excluded->contains($status))->sum();
+
+        $pending = 0;
+        if ($user) {
+            $pending = \App\Models\Application::query()->pendingFor($user)->count();
+        }
+
+        $completed = 0;
+        $closed = 0;
+        if ($user) {
+            $completed = \App\Models\Application::query()->completedFor($user)->count();
+            $closed = \App\Models\Application::query()->closedFor($user)->count();
+        }
+
+        $mine = 0;
+        if ($user && canViewMyManuscripts()) {
+            $mine = \App\Models\Application::query()->myManuscripts($user)->count();
+        }
+
+        // Inactive is only surfaced when the admin has the explicit permission,
+        // so only pay for the query when it will actually be rendered. This
+        // helper runs on every admin page render.
+        $inactive = 0;
+        if ($user && canViewInactiveApplications()) {
+            $inactive = \App\Models\Application::query()->inactive()->count();
+        }
+
+        // Chief approval queue: only surfaced for the superadmin (chief) role.
+        $chief = 0;
+        if ($user && method_exists($user, 'hasRole') && $user->hasRole('superadmin')) {
+            $chief = \App\Models\Application::query()
+                ->whereIn('status', ['chief-review', 'chief-approval', 'editor-accepts', 'editor-rejects', 'editor-revise'])
+                ->where('data->status', 'sended to chief approval')
+                ->count();
+        }
+
+        // Review Deadlines: admins + handling editors only.
+        $reviewDeadline = 0;
+        if ($user && canViewReviewDeadlines()) {
+            $reviewDeadline = \App\Http\Controllers\Admin\Application\ReviewDeadlineRepository::overdueCountFor($user);
+        }
+
+        return [
+            'all' => $all,
+            'pending' => $pending,
+            'completed' => $completed,
+            'closed' => $closed,
+            'mine' => $mine,
+            'published' => $counts->get('published', 0),
+            'rejected' => $counts->get('rejected', 0),
+            'withdrawn' => $counts->get('withdrawn', 0),
+            'duplicate' => $counts->get('duplicate', 0),
+            'inactive' => $inactive,
+            'chief' => $chief,
+            'review_deadline' => $reviewDeadline,
+        ];
+    }
+}
+
+// Whether the current admin may see the Inactive section. This is an
+// admin-only tool, and the role must also carry the explicit permission so a
+// technical editor cannot see it merely by being flagged as an admin.
+if (!function_exists('canViewInactiveApplications')) {
+    function canViewInactiveApplications()
+    {
+        $user = authUser('admin');
+
+        return $user && $user->is_admin == 1 && $user->can('application.inactive');
+    }
+}
+
+// Whether the current admin may see the "Review Deadlines" section: the role
+// must carry the explicit permission, and the user must be an admin or a
+// handling editor.
+if (!function_exists('canViewReviewDeadlines')) {
+    function canViewReviewDeadlines()
+    {
+        return \App\Http\Controllers\Admin\Application\ReviewDeadlineRepository::canView(authUser('admin'));
+    }
+}
+
+/**
+ * Normalise a stored DOI into a working link target.
+ *
+ * The `published_doi` column is free text: some rows hold a full URL
+ * (https://doi.org/10.xxxx/yyy), others hold a bare DOI (10.xxxx/yyy) and a
+ * few hold something that is not a DOI at all. Only the first two can be
+ * turned into a working link, so null is returned for anything else and the
+ * caller should render plain text instead of an anchor.
+ */
+if (!function_exists('doiLinkUrl')) {
+    function doiLinkUrl($doi)
+    {
+        $doi = trim((string) $doi);
+
+        if ($doi === '') {
+            return null;
+        }
+
+        if (preg_match('#^https?://#i', $doi)) {
+            return $doi;
+        }
+
+        // Bare DOI, e.g. 10.62541/jaspi001
+        if (preg_match('#^10\.\d{4,9}/\S+$#i', $doi)) {
+            return 'https://doi.org/' . $doi;
+        }
+
+        return null;
     }
 }
 
@@ -297,6 +437,20 @@ if(!function_exists('isReviewer')){
         return $user->hasRole('Reviewer');
     }
 }
+// Admin-style manuscript queue. Assistant Editors are not flagged as
+// `is_admin` in the database, but they still need the personal queue.
+if (!function_exists('canViewMyManuscripts')) {
+    function canViewMyManuscripts()
+    {
+        $user = authUser('admin');
+
+        return $user && (
+            $user->is_admin == 1
+            || (method_exists($user, 'hasRole') && $user->hasRole('assitantEditor'))
+        );
+    }
+}
+
 if(!function_exists('isPublisher')){
     function isPublisher()
     {
@@ -304,5 +458,21 @@ if(!function_exists('isPublisher')){
         return $user->hasRole('Publisher');
     }
 }
+if(!function_exists('isAssistantEditor')){
+    function isAssistantEditor()
+    {
+        $user = authUser('admin');
+        return $user->hasRole('assitantEditor');
+    }
+}
+if(!function_exists('isTechnicalEditor')){
+    function isTechnicalEditor()
+    {
+        $user = authUser('admin');
+        return $user->hasRole('technicalEditor');
+    }
+}
+
+
 
 

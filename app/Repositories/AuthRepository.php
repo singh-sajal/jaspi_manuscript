@@ -55,7 +55,7 @@ abstract class AuthRepository
 
             // Checkpoint 3- If the user is not active or organization is not allowed to login
 
-            if ($user->status == '0') {
+            if (!filter_var($user->status, FILTER_VALIDATE_BOOLEAN)) {
                 return errorResponse('Login not Permitted ! Contact Administrator');
             }
 
@@ -78,6 +78,10 @@ abstract class AuthRepository
                         'callback_hash' => encrypt($request->password),
                     ])
                 ], 200);
+            }
+            if ($user) {
+                // Reset the flag on each new login
+                session()->forget('cookie_consent_shown');
             }
 
             // Login user directly if two factor auth is not enabled
@@ -150,6 +154,13 @@ abstract class AuthRepository
     private function attemptLogin($ipAddress, $credentials, $uuid)
     {
         try {
+            $user = $this->model::where('uuid', $uuid)->first();
+
+            // The status may have changed while the account was in the 2FA flow.
+            if (!$user || !filter_var($user->status, FILTER_VALIDATE_BOOLEAN)) {
+                return errorResponse('Login not Permitted ! Contact Administrator');
+            }
+
             if (Auth::guard($this->guard)->attempt($credentials)) {
                 Cache::forget("login_attempts:$ipAddress");
                 Cache::forget("blocked_ip:$ipAddress");

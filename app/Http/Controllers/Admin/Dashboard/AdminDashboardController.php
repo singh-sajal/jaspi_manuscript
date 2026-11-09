@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Admin\Dashboard;
 
 
@@ -21,5 +22,19 @@ class AdminDashboardController extends Controller
     public function dashboard(Request $request)
     {
         return $this->repository->dashboard($request);
+    }
+
+    public function monthlyChart(Request $request)
+    {
+        return response()->json(
+            $this->repository->monthlyApplicationChartBuilder($request->query('year'))
+        );
+    }
+
+    public function weeklyChart(Request $request)
+    {
+        return response()->json(
+            $this->repository->lastSevenDaysApplicationChartBuilder($request->query('offset', 0))
+        );
     }
 }

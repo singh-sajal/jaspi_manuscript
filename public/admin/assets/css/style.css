@@ -748,6 +748,10 @@ textarea {
     line-height: inherit;
 }
 
+input[type="radio"] {
+    accent-color: #000;
+}
+
 button,
 select {
     text-transform: none;
@@ -38533,7 +38537,7 @@ textarea.form-control {
     border-width: 1px;
     width: 1.25rem;
     height: 1.25rem;
-    border-color: #e7e7e7;
+    border-color: #695e5e;
 }
 
 .rtl .form-check-label:before,

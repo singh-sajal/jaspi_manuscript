@@ -79,6 +79,7 @@ class AuthorAuthRepository extends AuthRepository
                     return errorResponse('Account with phone number already exist');
                 } else {
                     $otp = mt_rand(100000, 999999);
+                    // $otp = 999999;
                     $data = new \stdClass();
                     $data->otp = $otp;
                     $data->phone = $request->phone;
@@ -169,6 +170,7 @@ class AuthorAuthRepository extends AuthRepository
                 $request->all(),
                 [
                     'name' => 'required|string|max:255',
+                    'lname' => 'required|string|max:255',
                     'email' => 'required|string|email|max:255|unique:authors',
                     'phone' => 'required|string|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:authors',
                     'dob' => 'required|date|before:today',
@@ -188,6 +190,7 @@ class AuthorAuthRepository extends AuthRepository
             $userData = [
                 'username' => generateUniqueId(Author::class),
                 'name' => $request->name,
+                'lname' => $request->lname,
                 'dob' => $request->dob,
                 'phone' => $request->phone,
                 'password' => Hash::make($request->password),
@@ -322,6 +325,8 @@ class AuthorAuthRepository extends AuthRepository
                     'tokenable_type' => 'author',
                     'created_at' => Carbon::now(),
                 ]);
+
+                
                 if ($this->sendResetEmail($author, $secureToken)) {
                     return successResponse('A reset link has been sent to your email address.');
                 }
@@ -372,8 +377,11 @@ class AuthorAuthRepository extends AuthRepository
         abort(405, 'Method now allowed');
     }
 
+
     private function sendResetEmail($user, $token)
     {
+
+        // return true;
         try {
             $url = route('author.password.reset', ['token' => $token]);
             $user->notify(new PasswordResetLinkNotification($url, $token));
@@ -397,6 +405,7 @@ class AuthorAuthRepository extends AuthRepository
             $author = Author::uuid($uuid)->first();
             $data = [
                 'name' => $request->name,
+                'lname' => $request->lname,
                 'gender' => $request->gender,
                 'dob' => $request->dob,
                 'country' => $request->country ?? 'India',
@@ -406,7 +415,9 @@ class AuthorAuthRepository extends AuthRepository
                 'address' => $request->address,
 
             ];
+            // return $data;
             $updated = $author->update($data);
+            // return $updated;
             if ($updated) {
                 return successResponse('Profile has been updated successfully', route('author.profile', ['uuid' => $author->uuid]));
             }

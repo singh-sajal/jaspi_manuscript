@@ -17,7 +17,6 @@
 
             @include('author.cms.form')
 
-
             <div class="card-footer d-flex justify-content-end">
                 <button type="submit" class="btn btn-primary">Click to Continue</button>
             </div>

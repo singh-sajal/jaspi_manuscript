@@ -22,6 +22,30 @@ class AdminAuthController extends Controller
         return $this->repository->login($request);
     }
 
+    public function registration(Request $request)
+    {
+        return $this->repository->register($request);
+    }
+
+    public function userCheck(Request $request)
+    {
+        return $this->repository->userCheck($request);
+    }
+
+    public function verifyOtp(Request $request)
+    {
+        return $this->repository->verifyOtp($request);
+    }
+
+    public function store(Request $request)
+    {
+        // Mark consent as shown in this session
+        session(['cookie_consent_shown' => true]);
+
+        // return back()->with('success', 'Cookie consent accepted.');
+        return successResponse("Now you can proceed", route('admin.dashboard'));
+    }
+
     public function twoFactorAuthentication(Request $request)
     {
         return $this->repository->processTwoFactorLoginRequest($request);
@@ -80,6 +104,11 @@ class AdminAuthController extends Controller
     public function getAuthorProfile($uuid = null)
     {
         return $this->repository->getAuthorProfile($uuid);
+    }
+
+    public function updateAuthorProfile(AuthorProfileRequest $request, $uuid = null)
+    {
+        return $this->repository->updateAuthorProfile($request, $uuid);
     }
 
     public function authorChangePassword(AdminChangePasswordRequest $request, $uuid)

@@ -25,7 +25,7 @@ class QueryRepository
     public function index($request)
     {
 
-        $perPage = $request->perPage ?? 15;
+        $perPage = $request->perPage ?? 50;
         $rows = Webquery::query();
 
         // If Requested for specific service Admin

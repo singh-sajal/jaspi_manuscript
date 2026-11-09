@@ -16,6 +16,14 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
+        $schedule->command('queue:work --stop-when-empty --queue=default --tries=3')->everyMinute()->withoutOverlapping();
+
+        // Refresh per-reviewer deadline tracking and email handling editors
+        // about reviewers that have passed their timeout deadline.
+        $schedule->command('reviewers:sync-deadlines')->everyTenMinutes()->withoutOverlapping();
+
+        // Keep the notifications table from growing indefinitely.
+        $schedule->command('notifications:prune --days=90')->dailyAt('02:00')->withoutOverlapping();
     }
 
     /**

@@ -28,9 +28,18 @@ class AuthorAuthController extends Controller
     {
         $this->repository = $repository;
     }
+
     public function login(AuthorAuthRequest $request)
     {
         return $this->repository->login($request);
+    }
+    public function store(Request $request)
+    {
+        // Mark consent as shown in this session
+        session(['cookie_consent_shown' => true]);
+
+        // return back()->with('success', 'Cookie consent accepted.');
+        return successResponse("Now you can proceed", route('author.dashboard'));
     }
 
     public function registration(Request $request)

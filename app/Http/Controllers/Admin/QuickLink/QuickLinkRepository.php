@@ -19,7 +19,7 @@ class QuickLinkRepository
     public function index($request)
     {
 
-        $perPage = $request->perPage ?? 15;
+        $perPage = $request->perPage ?? 50;
         $records = QuickLink::query();
 
 

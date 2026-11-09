@@ -171,9 +171,19 @@
                 <form action="{{ route('author.registration') }}" method="POST" enctype="multipart/form-data"
                     novalidate>
                     @csrf
-                    <div class="form-group">
-                        <i class="fas fa-user"></i>
-                        <input type="text" name="name" placeholder="Author Name" required>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <i class="fas fa-user"></i>
+                                <input type="text" name="name" placeholder="First Name" required>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <i class="fas fa-user"></i>
+                                <input type="text" name="lname" placeholder="Last Name" required>
+                            </div>
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col">

@@ -126,9 +126,9 @@
             </div>
             <div class="col-md-8 col-12">
                 <div class="border">
-                    <form action="{{ route('admin.profile.update', ['uuid' => $admin->uuid]) }}" novalidate method="post">
+                    <form action="{{ route('admin.authorProfile.update', ['uuid' => $admin->uuid]) }}" novalidate method="post">
                         <div class="card-body">
-                            @include('admin.profile.form')
+                            @include('admin.profile.author-form')
                         </div>
                         {{-- <div class="card-footer d-flex justify-content-between align-items-center">
                             <p class="flex-grow-1 mb-0">Want to change your password ? <a href="#"

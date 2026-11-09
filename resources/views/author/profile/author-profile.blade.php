@@ -39,7 +39,7 @@
                                 alt="Img">
                         </div>
                         <div class="ms-3">
-                            <h6 class="fw-bold mb-0">{{ $author->name ?? '' }}</h6>
+                            <h6 class="fw-bold mb-0">{{ ($author->name. ' ' . $author->lname) ?? '' }}</h6>
                             <p class="fw-medium mb-1">{{ $author->username ?? '' }}</p>
                             <button class="btn actionHandler btn-dark btn-sm" data-handler="updateAvatar"
                                 data-url="{{ route('author.avatar.update') }}">Change Avatar</button>

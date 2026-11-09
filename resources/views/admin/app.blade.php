@@ -45,7 +45,8 @@
     <link href="{{ asset('admin/assets/vendor/quill/quill.core.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('admin/assets/vendor/quill/quill.bubble.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('admin/assets/vendor/quill/quill.snow.css') }}" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="{{ asset('admin/assets/css/datatable.css') }}">
+    <link rel="stylesheet" href="{{ asset('admin/assets/css/datatable-custom.css') }}">
+    <link rel="stylesheet" href="{{ asset('admin/assets/css/notification.css') }}">
     <link rel="stylesheet" href="{{ asset('admin/assets/css/validator.css') }}">
     <style>
         .deznav .metismenu>li>a i {
@@ -68,6 +69,11 @@
 
         #AjaxModal {
             z-index: 9999;
+        }
+
+        /* to hide filter button in saarni table */
+        .dt-filter-btn{
+            display: none;
         }
 
         .form-control:disabled,
@@ -169,7 +175,8 @@
                 @yield('breadcrumb-button')
 
             </div>
-            <div class="modal" id="AjaxModal" tabindex="-1"></div>
+            <div class="modal modal-fade" tabindex="-1" id="AjaxModal"  data-bs-backdrop="static" data-bs-keyboard="false"></div>
+
             @yield('content')
         </div>
 
@@ -211,6 +218,7 @@
        <script src="{{ asset('admin/assets/vendor/sweet-alert/toastr.min.js') }}"></script>
     <script src="{{ asset('admin/assets/vendor/sweet-alert/sweetalert.min.js') }}"></script>
     <script src="{{ asset('admin/assets/js/ajax-engine-1.0.js') }}"></script>
+    <script src="{{ asset('admin/assets/js/notification.js') }}"></script>
 
     <script src="{{ asset('admin/assets/js/pdfmake.min.js') }}"></script>
     <script src="{{ asset('admin/assets/js/vfs_fonts.js') }}"></script>
@@ -280,6 +288,7 @@
             document.body.classList.toggle('sidebar-collapsed');
         });
     </script>
-    @yield('javascripts') </body>
+    @yield('javascripts')
+</body>
 
 </html>

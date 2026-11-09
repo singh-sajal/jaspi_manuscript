@@ -59,4 +59,71 @@
 
         <input type="text" class="form-control" required name="address" value="{{ $admin->address ?? '' }}">
     </div>
+
+    @if ((!empty(auth()->user()->role) || authUser('admin')->is_admin == 1) && method_exists($admin, 'hasRole') && $admin->hasRole('Reviewer'))
+        <div class="col-12 my-3 border-top pt-3">
+            <h6 class="fw-bold">Reviewer Details</h6>
+        </div>
+        <div class="col-12 mb-3">
+            <label class="form-label">Annual/Associate/Life/Foundation member of SASPI?</label>
+            <div class="d-flex gap-4 mt-1">
+                <label style="font-weight: 400;">
+                    <input type="radio" name="saspi_member" value="Yes"
+                        {{ ($admin->saspi_member ?? '') == 'Yes' ? 'checked' : '' }}> Yes
+                </label>
+                <label style="font-weight: 400;">
+                    <input type="radio" name="saspi_member" value="No"
+                        {{ ($admin->saspi_member ?? '') == 'No' ? 'checked' : '' }}> No
+                </label>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 mb-3" id="membershipIdGroup" style="{{ ($admin->saspi_member ?? '') == 'Yes' ? '' : 'display: none;' }}">
+            <label class="form-label">Membership ID</label>
+            <input type="text" class="form-control" name="membership_id" value="{{ $admin->membership_id ?? '' }}">
+        </div>
+        <div class="col-12 col-md-6 mb-3">
+            <label class="form-label">Designation</label>
+            <input type="text" class="form-control" name="designation" value="{{ $admin->designation ?? '' }}">
+        </div>
+        <div class="col-12 col-md-6 mb-3">
+            <label class="form-label">Affiliation (including dept name)</label>
+            <input type="text" class="form-control" name="affiliation" value="{{ $admin->affiliation ?? '' }}">
+        </div>
+        <div class="col-12 col-md-6 mb-3">
+            <label class="form-label">Academic and/or Research Experience (in years)</label>
+            <input type="number" class="form-control" name="research_experience_years" min="0" step="0.1"
+                value="{{ $admin->research_experience_years ?? '' }}">
+        </div>
+        <div class="col-12 col-md-6 mb-3">
+            <label class="form-label">Average number of articles in indexed journals (PubMed/Scopus/DOAJ)</label>
+            <input type="number" class="form-control" name="avg_articles_published" min="0" step="0.1"
+                value="{{ $admin->avg_articles_published ?? '' }}">
+        </div>
+        <div class="col-12 col-md-6 mb-3">
+            <label class="form-label">h-Index</label>
+            <input type="text" class="form-control" name="h_index"
+                value="{{ $admin->h_index ?? '' }}">
+        </div>
+        <div class="col-12 mb-3">
+            <label class="form-label">Remarks</label>
+            <textarea class="form-control" name="remarks" rows="3">{{ $admin->remarks ?? '' }}</textarea>
+        </div>
+    @endif
+
+    <div class="col-12 my-3 border-top pt-3">
+        <h6 class="fw-bold">Interests</h6>
+    </div>
+    <div class="col-12 mb-3">
+        <div class="d-flex flex-wrap align-items-center gap-4">
+            @forelse ($integrations ?? [] as $integration)
+                <label style="font-weight: 400;">
+                    <input type="checkbox" name="integrations[]" value="{{ $integration->id }}"
+                        {{ in_array($integration->id, $adminIntegrations ?? []) ? 'checked' : '' }}>
+                    {{ $integration->name }}
+                </label>
+            @empty
+                <span class="text-muted">No interests available yet.</span>
+            @endforelse
+        </div>
+    </div>
 </div>

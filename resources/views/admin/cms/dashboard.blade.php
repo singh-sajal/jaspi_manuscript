@@ -4,6 +4,31 @@
 @section('breadcrumb', 'Dashboard')
 @section('page-title', 'Dashboard')
 @section('breadcrumb-button')
+    @php
+        use App\Models\Admin;
+        $verify = Admin::where('rev_type', 'external')->where('status', 0)->count();
+
+    @endphp
+
+    @if (isSuperAdmin())
+        @if ($verify == 0)
+            <div class="alert alert-success text-center fw-bold">
+                No verification pending.
+            </div>
+        @elseif ($verify == 1)
+            <div class="alert alert-warning text-center fw-bold">
+                Please verify {{ $verify }} External Reviewer —
+                <a href="{{ route('admin.staff.index') }}" class="alert-link">Go to Staff</a>
+            </div>
+        @else
+            <div class="alert alert-danger text-center fw-bold">
+                Please verify {{ $verify }} External Reviewers —
+                <a href="{{ route('admin.staff.index') }}" class="alert-link">Go to Staff</a>
+            </div>
+        @endif
+    @endif
+
+
 
 @endsection
 @section('css')
@@ -37,6 +62,95 @@
     </style>
 @endsection
 @section('content')
+
+    @if (auth()->check() && !session('cookie_consent_shown') && isReviewer())
+        <!-- Cookie + Ethics Consent Modal -->
+        <div class="modal fade" id="cookieConsentModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+                <div class="modal-content p-4">
+                    <div class="modal-header">
+                        <h4 class="modal-title fw-bold">
+                            <i class="bi bi-shield-lock-fill me-2"></i> Consent Required
+                        </h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <p class="mb-3">
+                            We use cookies to ensure you get the best experience. By continuing, you agree to our cookie
+                            policy.
+                        </p>
+                        <ul class="mb-3">
+                            <li>Remember your login session securely.</li>
+                            <li>Improve performance and speed.</li>
+                            <li>Store your preferences and settings.</li>
+                            <li>Provide personalized content where applicable.</li>
+                            <li>Analyze site usage for improvements.</li>
+                        </ul>
+                        <p class="text-muted">
+                            By clicking <strong>Accept</strong>, you agree to our use of cookies.
+                            {{-- in line with our --}}
+                            {{-- <a href="#" class="text-decoration-underline">Privacy Policy</a>. --}}
+                        </p>
+
+                        <div class="alert alert-warning rounded-3 p-3 mt-4">
+                            <h5 class="fw-bold text-danger mb-2">
+                                ⚠️ Important Ethical Reminder
+                            </h5>
+                            <p class="mb-2">
+                                Let’s practice and be a <strong>HARD FACTOR</strong> while doing research and publication in
+                                infection prevention,
+                                source control, right diagnosis, and right antimicrobial utilization with respect to:
+                            </p>
+                            <ul>
+                                <li><strong>H</strong>onesty</li>
+                                <li><strong>A</strong>uthorship</li>
+                                <li><strong>R</strong>espect & Review</li>
+                                <li><strong>D</strong>ata analysis & sharing</li>
+                                <li><strong>F</strong>airness</li>
+                                <li><strong>A</strong>ccuracy</li>
+                                <li><strong>C</strong>onflicts of interest</li>
+                                <li><strong>T</strong>ransparency</li>
+                                <li><strong>O</strong>riginality</li>
+                                <li><strong>R</strong>etractions & corrections</li>
+                            </ul>
+                            <p class="mb-2">
+                                These principles must be followed carefully in relation to the drug, its dose, delivery,
+                                duration,
+                                and decision on follow-up.
+                            </p>
+                            <p class="mb-0">
+                                In addition, all reviewers and authors are required to go through and practice the mandatory
+                                policies of JASPI:
+                                <a href="https://jaspi.saspi.in/publication-ethics/" target="_blank">Publication Ethics</a>,
+                                <a href="https://jaspi.saspi.in/editorial-policy/" target="_blank">Editorial Policy</a>, and
+                                <a href="https://jaspi.saspi.in/peer-review/" target="_blank">Peer Review Policy</a>.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer border-top-0">
+                        <form method="POST" action="{{ route('admin.cookie.consent') }}" class="m-0">
+                            @csrf
+                            <button type="submit" class="btn btn-primary px-4">Accept</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                let modal = new bootstrap.Modal(document.getElementById('cookieConsentModal'));
+                modal.show();
+            });
+        </script>
+    @endif
+
+
+
+
+
+
     @php
         $widgets = ['bg-primary', 'bg-warning', 'bg-dark', 'bg-danger', 'bg-success', 'bg-info'];
         $widgetIcons = [
@@ -97,10 +211,11 @@
                             </h4>
                             <h3 class="mt-3 text-white">{{ $count }}</h3>
                             <div class="progress mb-2">
-                                <div class="progress-bar progress-animated bg-light" style="width: {{ $progressPercent }}%">
+                                <div class="progress-bar progress-animated bg-light"
+                                    style="width: {{ $progressPercent }}%">
                                 </div>
                             </div>
-                            <small>Applications</small>
+                            <small>Manuscripts</small>
                         </div>
                     </div>
                 @endforeach
@@ -109,8 +224,16 @@
             <div class="row">
                 <div class="col-8">
                     <div class="card">
-                        <div class="card-header">
-                            <h4 class="card-title">Monthly Applications</h5>
+                        <div class="card-header d-flex align-items-center justify-content-between">
+                            <h4 class="card-title mb-0">Monthly Manuscripts</h4>
+                            <select id="monthlyChartYear" class="form-select form-select-sm" style="width:auto;">
+                                @foreach ($years as $yr)
+                                    <option value="{{ $yr }}"
+                                        {{ $yr == $charts['monthlyApplicationChart']['year'] ? 'selected' : '' }}>
+                                        {{ $yr }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
                         <div class="card-body">
                             <canvas id="monthlyApplicationChart" height="250"></canvas>
@@ -120,15 +243,15 @@
                 <div class="col-4 px-1">
                     <div class="card">
                         <div class="card-header">
-                            <h4 class="card-title">Recent Applications</h5>
+                            <h4 class="card-title">Recent Manuscripts</h5>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive recentOrderTable">
                                 <table class="verticle-middle table">
                                     <thead>
                                         <tr>
-                                            <th scope="col">Application No.</th>
-                                            <th scope="col">Date</th>
+                                            <th scope="col">Manuscript No.</th>
+                                            <th scope="col">Updated On</th>
                                             <th scope="col">Status</th>
 
                                         </tr>
@@ -140,9 +263,9 @@
                                                         href="{{ route('admin.application.show', $application->uuid) }}">
                                                         {{ $application->application_id ?? '' }} </a></td>
 
-                                                <td>{{ $application->created_at->format('d-M-Y') }}</td>
-                                                <td><span
-                                                        class="badge badge-rounded badge-primary">{{ ucFirst($application->status ?? '') }}</span>
+                                                <td>{{ $application->updated_at->format('d-M-Y') }}</td>
+                                                <td><a href="{{ route('admin.application.show', $application->uuid) }}"
+                                                        class="badge badge-rounded badge-primary">{{ ucFirst($application->status ?? '') }}</a>
                                                 </td>
 
                                             </tr>
@@ -162,7 +285,7 @@
                 <div class="col-6 px-1">
                     <div class="card">
                         <div class="card-header">
-                            <h4 class="card-title">Application Status</h5>
+                            <h4 class="card-title">Manuscript Status</h5>
                         </div>
                         <div class="card-body">
                             <canvas id="applicationStatusChart" height="250"></canvas>
@@ -172,8 +295,19 @@
 
                 <div class="col-6 px-1">
                     <div class="card">
-                        <div class="card-header">
-                            <h4 class="card-title">Weekly Applications</h5>
+                        <div class="card-header d-flex align-items-center justify-content-between">
+                            <h4 class="card-title mb-0">Weekly Manuscripts</h4>
+                            <div class="d-flex align-items-center gap-2">
+                                <button type="button" id="weeklyChartPrev" class="btn btn-sm btn-outline-secondary">
+                                    <i class="ri-arrow-left-s-line"></i>
+                                </button>
+                                <small id="weeklyChartRange" class="text-muted">
+                                    {{ $charts['lastSevenDaysApplicationChart']['rangeLabel'] ?? '' }}
+                                </small>
+                                <button type="button" id="weeklyChartNext" class="btn btn-sm btn-outline-secondary">
+                                    <i class="ri-arrow-right-s-line"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="card-body">
                             <canvas id="weeklyApplicationChart" height="250"></canvas>

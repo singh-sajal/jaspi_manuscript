@@ -20,7 +20,7 @@ class ConsultantRepository
     public function index($request)
     {
 
-        $perPage = $request->perPage ?? 15;
+        $perPage = $request->perPage ?? 50;
         $records = Consultant::query()->where('parent_id', null);
         $this->search($request, $records);
         $this->sort($request, $records);

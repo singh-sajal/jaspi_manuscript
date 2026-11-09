@@ -6,16 +6,28 @@ use App\Http\Controllers\Admin\Auth\AdminAuthRepository;
 use App\Http\Controllers\Author\Auth\AuthorAuthRepository;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
+use App\Models\Application;
 use App\Models\Author;
 use App\Models\Webquery;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-
 use Illuminate\Support\Facades\Validator;
 use Throwable;
 
 class HomeController extends Controller
 {
+
+    public function redirect()
+    {
+
+        if (Auth::guard('admin'))
+            $user = authUser('admin');
+        else
+            $user = authUser('');
+
+        return $user;
+    }
 
     public function contact(Request $request)
     {
@@ -84,7 +96,6 @@ class HomeController extends Controller
                     'errors' => $validator->errors()
                 ], 422);
             }
-
             $role = $request->role;
             $email = $request->username;
 
@@ -93,7 +104,6 @@ class HomeController extends Controller
                 $newRequest = $request->merge([
                     'email' => $email
                 ]);
-
 
                 return $repository->sendPasswordResetLink($newRequest);
                 // $user_info = Author::where('email', $email)->first();
@@ -118,5 +128,104 @@ class HomeController extends Controller
         }
 
         abort(405, 'method not allowed');
+    }
+
+    public function published_index(Request $request)
+    {
+
+        $perPage = $request->perPage ?? 50;
+
+        // $staffs = Admin::where('is_admin', false)->whereHas('roles', function ($q) {
+        //     $q->where('name', 'Editor');
+        // })->get();
+        $type = $request->type ?? '';
+
+        $applications = Application::query()->with('assignee', 'attachments')->where('status', 'published');
+
+
+        // if (authUser('admin')->is_admin == 0) {
+            // $applications = $applications->where('assigned_to_id', authUser('admin')->id)
+            //     // ->where('status','!=','incomplete')
+            //     ->orWhereHas('timelines', function ($query) {
+            //         $query->where('assigned_to_id', authUser('admin')->id);
+            //     });
+        // }
+
+        // if (authUser('admin')->rev_type == 'external') {
+        //     $applications = Application::query()->where('assigned_to_ex_id', authUser('admin')->id);
+        // }
+
+
+        // return $applications->get();
+
+        $this->search($request, $applications);
+        $this->sort($request, $applications);
+
+        $applications = $applications->paginate($perPage);
+        // return $applications;
+
+        if ($request->ajax()) {
+
+            try {
+                $datatable = view('published.datatable', compact('applications'))->render();
+                return response()->json([
+                    'status' => '200',
+                    'msg' => 'Data loaded',
+                    'data' => $datatable,
+                    'paginationInfo' => getPaginationInfo($applications)
+                ], 200);
+            } catch (Throwable $th) {
+                return throwException($th);
+            }
+        }
+        return view('published.index', compact('type'));
+    }
+
+    private function search($request, $query)
+    {
+        // if (!empty($request->search)) {
+        //     $statusMap = [
+        //         'active' => true,
+        //         'inactive' => false,
+        //     ];
+        //     $statusValue = $statusMap[strtolower($request->search)] ?? null;
+        //     $query->where(function ($subQuery) use ($request, $statusValue) {
+        //         $subQuery->where('title', 'LIKE', "%{$request->search}%")
+        //             ->orWhere('type', 'LIKE', "%{$request->search}%")
+        //             ->orWhereHas('service', function ($q) use ($request) {
+        //                 $q->where('name', 'LIKE', "%{$request->search}%");
+        //             })
+        //             ->orWhereHas('creator', function ($q) use ($request) {
+        //                 $q->where('name', 'LIKE', "%{$request->search}%");
+        //             })
+        //             ->orWhere('created_at', 'LIKE', "%{$request->search}%");
+
+        //         if (!is_null($statusValue)) {
+        //             $subQuery->orWhere('status', $statusValue);
+        //         }
+        //     });
+        // }
+
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('application_id', 'like', "%{$searchTerm}%")
+                    ->orWhere('submission_type', 'like', "%{$searchTerm}%")
+                    ->orWhere('title', 'like', "%{$searchTerm}%");
+                // ->orWhere('phone', 'like', "%{$searchTerm}%");
+            });
+        }
+    }
+
+    private function sort($request, $query, $validColumns = [])
+    {
+
+        // if (!empty($request->sortColumn) && in_array($request->sortColumn, $validColumns)) {
+        if (!empty($request->sortColumn)) {
+            $query->orderBy($request->sortColumn, "{$request->sortDirection}");
+        } else {
+            $query->orderBy('updated_at', 'desc');
+        }
     }
 }

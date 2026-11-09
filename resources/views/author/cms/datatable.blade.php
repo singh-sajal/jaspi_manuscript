@@ -6,10 +6,19 @@
                 {{-- <img class="avatar avatar-md me-2"
                     src="{{ asset($application->avatar ?? 'admin/assets/images/avatar/1.png') }}" alt="{{ $application->name }}"> --}}
 
+                {{-- @php
+                    $isShowPage = $application->status != 'incomplete' && $application->status != 'revise';
+                    $url = $isShowPage
+                        ? route('author.application.show', $application->uuid)
+                        : route('author.application.create', [
+                            'applicationId' => $application->uuid,
+                            'step' => 'documents',
+                        ]);
+                @endphp --}}
                 {{-- Add the name and username into flex column the username a slight smaller --}}
                 <a class="d-flex flex-column" href="{{ route('author.application.show', $application->uuid) }}">
-                    <span class="text-dark fw-bold">{{ $application->title }}</span>
-                    <span class="text-muted">{{ $application->application_id ?? '---' }}</span>
+                    <span class="text-dark fw-bold" style="text-wrap:auto;">{{ $application->title }}</span>
+                    <span class="text-muted">{{ $application->application_id ?? '' }}</span>
                 </a>
             </div>
         </td>
@@ -38,33 +47,43 @@
 
             </div>
         </td>
+
+
+        @php
+            $status = $application->status;
+        @endphp
+
         <td>
-            @if ($application->status == 'incomplete')
-                @if ($application->isReadyToSubmit())
-                    <span class="badge bg-danger actionHandler" data-action="togglestatus"
-                        data-url="{{ route('author.application.toggleStatus', [
-                            'uuid' => $application->uuid,
-                            'column' => 'status',
-                            'status' => 'submitted',
-                        ]) }}">Ready
-                        To Submit</span>
-                @else
-                    <a href="{{ route('author.application.show', $application->uuid) }}" class="badge bg-danger">
-                        {{ $application->status }}
-                    </a>
-                @endif
+            {{-- STATUS BADGE --}}
+            @if ($status === 'incomplete')
+                <a href="{{ route('author.application.show', $application->uuid) }}#manuscript"
+                    class="badge rounded-pill bg-danger px-3 py-2">
+                    {{ ucfirst($status) }}
+                </a>
+            @elseif (in_array($status, ['editor-accepts', 'editor-rejects', 'editor-revise', 'chief-approval', 'chief-review', 'chief-response', 'assigning reviewers', 'reviewed']))
+                <span class="badge rounded-pill bg-warning text-dark px-3 py-2">
+                    Processing
+                </span>
+            @elseif(in_array($status, ['under review']))
+                <span class="badge rounded-pill bg-warning text-dark px-3 py-2">
+                    Processed
+                </span>
             @else
-                <div class="d-flex align-items-center ms-3">
-                    <span
-                        class="badge bg-{{ $application->status === 'submitted' ? 'success' : 'dark' }}">{{ $application->status }}</span>
-                </div>
+                <span class="badge rounded-pill bg-secondary px-3 py-2">
+                    {{ ucfirst($status) }}
+                </span>
             @endif
-            @if ($application->status == 'published')
+
+
+
+
+            {{-- PUBLISHED FILE VIEW --}}
+            @if ($status === 'published')
                 <div class="ms-5 my-3">
                     <span class="fs-12 text-dark text-decoration-underline actionHandler px-1 text-center"
                         data-url="{{ route('file.viewframe') }}" data-frame="offcanvas"
                         data-file-url="{{ getFileUrl($application->data['file_url'] ?? '') }}"
-                        data-handler="openFilePreview" target="_blank" title="View Published File">
+                        data-handler="openFilePreview" title="View Published File">
                         View
                     </span>
                 </div>
@@ -73,7 +92,9 @@
 
 
 
-        <td>
+
+
+        {{-- <td>
             <div class="d-flex align-items-center">
 
                 <img class="avatar avatar-sm me-2"
@@ -81,7 +102,7 @@
                     alt="avatar">
                 <span class="text-dark fw-bold">{{ $application->assignee->name ?? '---' }}</span>
             </div>
-        </td>
+        </td> --}}
 
 
         <td>{{ $application->created_at->format('d-M-Y, h:i') }}</td>
@@ -91,7 +112,7 @@
                 {{-- <a class="btn btn-sm btn-secondary" href="{{ route('admin.author.edit', $author->uuid) }}"> <i
                         class="ri-edit-box-line"></i></a> --}}
                 <a class="btn btn-sm btn-secondary btn-label"
-                    href="{{ route('author.application.show', $application->uuid) }}">
+                    href="{{ route('author.application.show', $application->uuid) }}#manuscript">
                     {{-- <i class="ri-edit-box-line"></i> --}}
                     <i class="ri-eye-line"></i>
                 </a>

@@ -19,7 +19,7 @@ class ChecklistRepository
     public function index($request)
     {
 
-        $perPage = $request->perPage ?? 15;
+        $perPage = $request->perPage ?? 50;
         $records = Checklist::query()->with('creator', 'service');
 
         // If Requested for specific service checklist

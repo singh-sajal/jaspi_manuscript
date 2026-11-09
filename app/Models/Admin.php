@@ -30,6 +30,11 @@ class Admin extends Authenticatable
         return $this->morphMany(Activity::class, 'loggable');
     }
 
+    public function integrations()
+    {
+        return $this->belongsToMany(Integration::class, 'admin_integration');
+    }
+
     // public function role(){
     //     return $this->hasMany(Package::class,'destination_id','id');
     // }

@@ -26,7 +26,7 @@ class AuthorRepository
     public function index($request)
     {
 
-        $perPage = $request->perPage ?? 15;
+        $perPage = $request->perPage ?? 50;
         $authors = Author::query();
 
         // return $authors;
@@ -67,6 +67,7 @@ class AuthorRepository
             $data = [
 
                 'name' => $request->name,
+                'lname' => $request->lname,
                 'email' => $request->email,
                 'phone' => $request->phone,
                 'username' => generateUniqueId(Author::class),
@@ -120,6 +121,7 @@ class AuthorRepository
             // Prepare the data for update
             $data = [
                 'name' => $request->name,
+                'lname' => $request->lname,
                 'email' => $request->email,
                 'phone' => $request->phone,
                 'dob' => $request->dob,
@@ -200,7 +202,7 @@ class AuthorRepository
         $author = $this->getAuthor($uuid);
 
         if ($request->isMethod('GET')) {
-            return view('admin.cms.author.generatecredentials', compact('author'));
+            return view('admin.cms.author.generateCredentials', compact('author'));
         }
         if ($request->isMethod('POST')) {
 

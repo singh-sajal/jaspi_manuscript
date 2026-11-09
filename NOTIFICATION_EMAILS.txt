@@ -1,0 +1,407 @@
+================================================================================
+JASPI MANUSCRIPT MANAGEMENT SYSTEM - EMAIL NOTIFICATION REFERENCE
+================================================================================
+Generated: 2026
+This document lists every email the system can send, the mailer class & view
+path used by each, when it is triggered, who receives it, and the manuscript
+status change (if any) that accompanies the trigger.
+
+Totals: 25 mailables
+  - 20 workflow emails (part of the manuscript lifecycle)
+  -  4 utility / account emails
+  -  1 admin bulk mail
+
+Emails with CC/BCC recipients (4):
+  - AuthorSubmissionMail        CC: jaspi@saspi.in, technical.editor@jaspi.saspi.in
+  - EditorAssignmentMail        CC: jaspi@saspi.in
+  - ReviewerReminder            CC: akanksha.itconsultant@gmail.com
+  - AdminMessageMail            CC: akanksha.itconsultant@gmail.com, BCC: sender
+
+================================================================================
+A. MANUSCRIPT WORKFLOW EMAILS (in lifecycle order)
+================================================================----------------
+
+--------------------------------------------------------------------------------
+A01. Author Submission Confirmation
+--------------------------------------------------------------------------------
+Mailable  : App\Mail\AuthorSubmissionMail
+Path      : app/Mail/AuthorSubmissionMail.php
+View      : resources/views/emails/author/submission (—)
+Subject   : Manuscript submission (author confirmation)
+Trigger   : Author submits an application
+            app\Http\Controllers\Author\Application\ApplicationRepository.php
+            (toggleStatus / submit flow)  -> line ~1212
+Recipient : Author (applicant email)
+CC        : jaspi@saspi.in, technical.editor@jaspi.saspi.in
+Status change: 'submitted'
+
+--------------------------------------------------------------------------------
+A02. Technical Editor - Manuscript Assigned (Accept / Out of Scope)
+--------------------------------------------------------------------------------
+Mailable  : App\Mail\AssistantEditorAssignmentMail
+Path      : app/Mail/AssistantEditorAssignmentMail.php
+View      : resources/views/emails/assistantEditor/assignment.blade.php (markdown)
+Subject   : "New Manuscript Assigned to You - JASPI"
+Trigger   : Technical editor decision POST
+            app\Http\Controllers\Admin\Application\ApplicationRepository.php
+            techEditorDecision() -> helper notifyAssistantEditor()  line ~1642
+Recipient : Users with role 'assitantEditor' (note: typo is intentional in DB)
+Status change:
+            decision=accept       -> 'technical checks approved'
+            decision=out-of-scope -> 'out of scope'
+
+--------------------------------------------------------------------------------
+A03. Author - Manuscript Requires Revision (Tech Editor Revise)
+--------------------------------------------------------------------------------
+Mailable  : App\Mail\AuthorReviseMail
+Path      : app/Mail/AuthorReviseMail.php
+View      : resources/views/emails/author/revise.blade.php (html)
+Subject   : "Your Manuscript Requires Revision - JASPI"
+Trigger   : Technical editor decision = revise  (line ~1564 / ~1574)
+            notifyAuthorRevise() helper  line ~1586
+Recipient : Author
+Status change: 'revise'
+
+--------------------------------------------------------------------------------
+A04. Handling Editor Assignment / Re-assignment
+--------------------------------------------------------------------------------
+Mailable  : App\Mail\EditorAssignmentMail
+Path      : app/Mail/EditorAssignmentMail.php
+View      : resources/views/emails/editor/assignment.blade.php (markdown)
+Subject   : "New Manuscript Assigned to You"
+Trigger   : assignApplication() POST
+            app\Http\Controllers\Admin\Application\ApplicationRepository.php
+            line ~744 (also cc: jaspi@saspi.in)
+Recipient : Assigned handling editor (role 'Editor')
+CC        : jaspi@saspi.in
+
+Status change: 'processing'
+
+--------------------------------------------------------------------------------
+A05. Handling Editor Declined Assignment (notify assigner)
+--------------------------------------------------------------------------------
+Mailable  : App\Mail\EditorDeclinedAssignmentMail
+Path      : app/Mail/EditorDeclinedAssignmentMail.php
+View      : resources/views/emails/editor/declined.blade.php (markdown)
+Subject   : "Handling Editor Declined Assignment - {id}"
+Trigger   : handlingEditorDecision() POST, decision = 0 (decline)
+            app\Http\Controllers\Admin\Application\ApplicationRepository.php
+            helper notifyAssignerOfEditorDecline()  line ~1860
+Recipient : Assigner captured from the latest 'processing' timeline
+            (assigned_by) BEFORE the decline timeline is inserted
+Status change: none (manuscript stays 'processing'; decision stored in data)
+
+--------------------------------------------------------------------------------
+A06. Handling Editor Final Decision (notify assigner)
+--------------------------------------------------------------------------------
+Mailable  : App\Mail\EditorFinalDecisionMail
+Path      : app/Mail/EditorFinalDecisionMail.php
+View      : resources/views/emails/assigner/editorFinalDecision.blade.php (markdown)
+Subject   : "Handling Editor Final Decision - {id}"
+Trigger   : editor_accepts / editor_revise / editor_rejects POSTs,
+            app\Http\Controllers\Admin\Application\ApplicationRepository.php
+            helper notifyEditorFinalDecision()  line ~1663
+            ALSO fired from editorDecision() 'Make a decision' cases 3 & 4
+            (score-based bypass)  line ~2470
+Recipient : Assigner (assigned_by of latest 'processing' timeline)
+Status change:
+            accept  -> 'editor-accepts'
+            revise  -> 'editor-revise'
+            reject  -> 'editor-rejects'
+
+--------------------------------------------------------------------------------
+A07. Chief Approval Request (assistant editor -> chief)
+--------------------------------------------------------------------------------
+Mailable  : App\Mail\ChiefApprovalRequestMail
+Path      : app/Mail\ChiefApprovalRequestMail.php
+View      : resources/views/emails/chief/approvalRequest.blade.php (markdown)
+Subject   : "Final Approval Request - {id}"
+Trigger   : assistantToChiefForApproval() POST
+            app\Http\Controllers\Admin\Application\ApplicationRepository.php
+            helper notifyChief()  line ~1687
+Recipient : Chief (role 'superadmin'; fallback is_admin=1)
+Status change: none (stores chief_requested_by in application data)
+
+--------------------------------------------------------------------------------
+A08. Chief Approval Response (chief -> requester)
+--------------------------------------------------------------------------------
+Mailable  : App\Mail\ChiefApprovalResponseMail
+Path      : app/Mail\ChiefApprovalResponseMail.php
+View      : resources/views/emails/chief/approvalResponse.blade.php (markdown)
+Subject   : "Chief's Decision - {id}"
+Trigger   : chiefToAssistanResponse() POST
+            app\Http\Controllers\Admin\Application\ApplicationRepository.php
+            helper notifyRequester()  line ~1710
+Recipient : Requester (chief_requested_by from application data)
+Status change: none (department accepts/rejects in separate endpoints)
+
+--------------------------------------------------------------------------------
+A09. Author Final Decision (Accept / Reject / Revise)
+--------------------------------------------------------------------------------
+Mailable  : App\Mail\AuthorFinalDecisionMail
+Path      : app/Mail\AuthorFinalDecisionMail.php
+View      : resources/views/emails/author/finalDecision.blade.php (html)
+Subject   : "Final Decision on Your Manuscript - {id} (Accepted/Rejected/Revision Required)"
+Trigger   : acceptance() / rejection() / revise() POSTs
+            app\Http\Controllers\Admin\Application\ApplicationRepository.php
+            helper notifyAuthorFinalDecision()  line ~1726
+Recipient : Author
+Status change:
+            acceptance -> 'pre-accepted'   (kept; 'accepted' reserved for publisher)
+            rejection  -> 'rejected'
+            revise     -> 'revise'
+
+--------------------------------------------------------------------------------
+A10. Technical Editor - Accepted Manuscript Notice
+--------------------------------------------------------------------------------
+Mailable  : App\Mail\TechnicalEditorNotificationMail
+Path      : app/Mail\TechnicalEditorNotificationMail.php
+View      : resources/views/emails/technicalEditor/accepted.blade.php (markdown)
+Subject   : "Accepted Manuscript for Technical Processing - {id}"
+Trigger   : acceptance() POST ONLY (accept branch)
+            app\Http\Controllers\Admin\Application\ApplicationRepository.php
+            helper notifyTechnicalEditor()  line ~1745
+Recipient : Users with role 'technicalEditor'
+Status change: same as A09 accept -> 'pre-accepted'
+
+--------------------------------------------------------------------------------
+A11. Publisher Assignment
+--------------------------------------------------------------------------------
+Mailable  : App\Mail\PublisherAssignmentMail
+Path      : app/Mail\PublisherAssignmentMail.php
+View      : resources/views/emails/publisher/assignment.blade.php (markdown)
+Subject   : "New Manuscript Assigned to You for Publishing - {id}"
+Trigger   : assignPublisher() POST
+            app\Http\Controllers\Admin\Application\ApplicationRepository.php
+            helper notifyPublisher()  line ~1763
+Recipient : Assigned publisher (role 'Publisher' or superadmin)
+Status change: 'accepted'  (assigned_to_id = publisher)
+
+--------------------------------------------------------------------------------
+A12. Author Re-submission (revised manuscript) - notify tech editors
+--------------------------------------------------------------------------------
+Mailable  : App\Mail\AuthorResubmittedMail
+Path      : app/Mail\AuthorResubmittedMail.php
+View      : resources/views/emails/technicalEditor/resubmitted.blade.php (markdown)
+Subject   : "Revised Manuscript Re-submitted - {id}"
+Trigger   : Author reSubmission() POST
+            app\Http\Controllers\Author\Application\ApplicationRepository.php
+            helper notifyTechnicalEditorsResubmitted()  line ~1695
+Recipient : Users with role 'technicalEditor'
+Status change: 'resubmitted'
+
+--------------------------------------------------------------------------------
+A13. Reviewer Invitation (external peer reviewer onboarding)
+--------------------------------------------------------------------------------
+Mailable  : App\Mail\ReviewerInvitation
+Path      : app/Mail\ReviewerInvitation.php
+View      : resources/views/emails/reviewer/invitation.blade.php (html)
+Subject   : "Invitation to Join as a Peer Reviewer"
+Trigger   : Invite reviewer flows
+            app\Http\Controllers\Admin\InviteReviewer\InviteReviewerRepository.php
+            lines ~71, 93, 152, 217, 249
+Recipient : Invited external reviewer (email / invitation record)
+Status change: none (updates last_invited_at)
+
+--------------------------------------------------------------------------------
+A14. Reviewer Assignment (internal reviewer)
+--------------------------------------------------------------------------------
+Mailable  : App\Mail\ReviewerAssigned
+Path      : app/Mail\ReviewerAssigned.php
+View      : resources/views/emails/reviewer/assigned.blade.php (markdown)
+Subject   : Dynamic (Reviewer Assignment for manuscript title)
+Trigger   : assignReviewer / re-review flows
+            app\Http\Controllers\Admin\Application\ApplicationRepository.php
+            notifyReviewer() helper  line ~2750
+Recipient : Assigned internal reviewer
+Status change: 'assigning reviewers' / 'under review' / 're-review'
+
+--------------------------------------------------------------------------------
+A15. Reviewer Reminder
+--------------------------------------------------------------------------------
+Mailable  : App\Mail\ReviewerReminder
+Path      : app/Mail\ReviewerReminder.php
+View      : resources/views/emails/reviewer/remindReviewers.blade.php (html)
+Subject   : "Reminder: Pending Manuscript Review - {title}"
+Trigger   : remindReviewers()
+            app\Http\Controllers\Admin\Application\ApplicationRepository.php
+            line ~1271
+Recipient : Assigned reviewer(s)
+CC        : akanksha.itconsultant@gmail.com
+Status change: none
+            (applicable during 'assigning reviewers' / 'under review' / 're-review')
+
+--------------------------------------------------------------------------------
+A16. Reviewer Declined Assignment (notify handling editor)
+--------------------------------------------------------------------------------
+Mailable  : App\Mail\ReviewerDeclinedMail
+Path      : app/Mail\ReviewerDeclinedMail.php
+View      : resources/views/emails/reviewer/declined.blade.php (markdown)
+Subject   : "Reviewer Declined Assignment - {id}"
+Trigger   : rev_denied_action()
+            app\Http\Controllers\Admin\Application\ApplicationRepository.php
+            helper notifyReviewerDeclined()  line ~1839
+Recipient : Handling editor (assigned_to_id of latest 'processing' timeline)
+Status change: none at status level; sets accept_in (0) or accept_ex (0)
+
+--------------------------------------------------------------------------------
+A17. Review Submitted (notify handling editor)
+--------------------------------------------------------------------------------
+Mailable  : App\Mail\ReviewSubmittedMail
+Path      : app/Mail\ReviewSubmittedMail.php
+View      : resources/views/emails/reviewer/submitted.blade.php (markdown)
+Subject   : "Review Submitted - {id}"
+Trigger   : reviewScore() POST
+            app\Http\Controllers\Admin\Application\ApplicationRepository.php
+            helper notifyReviewSubmitted()  line ~1813
+Recipient : Handling editor (assigned_to_id of latest 'processing' timeline)
+Status change: 'reviewed' once all reviewers have submitted
+            (status_ex == 3 or no external reviewer assigned)
+
+--------------------------------------------------------------------------------
+A18. Formatted Proof Ready (publisher -> tech editor)
+--------------------------------------------------------------------------------
+Mailable  : App\Mail\FormattedProofReadyMail
+Path      : app/Mail\FormattedProofReadyMail.php
+View      : resources/views/emails/publisher/formattedProof.blade.php (markdown)
+Subject   : "Formatted Proof Ready for Review - {id}"
+Trigger   : formatted_document() POST
+            app\Http\Controllers\Admin\Application\ApplicationRepository.php
+            helper notifyTechnicalEditorFormattedProof()  line ~1786
+Recipient : Users with role 'technicalEditor'
+Status change: 'typesetting review'  (assigned_to_id = tech editor)
+
+--------------------------------------------------------------------------------
+A19. Proofreading Required (send to author)
+--------------------------------------------------------------------------------
+Mailable  : App\Mail\ProofreadingMail
+Path      : app/Mail\ProofreadingMail.php
+View      : resources/views/emails/author/proofreading.blade.php (html)
+Subject   : "Manuscript Proofreading Required: {title}"
+Trigger   : send_for_proofreading() POST
+            app\Http\Controllers\Admin\Application\ApplicationRepository.php
+            line ~2068
+Recipient : Author
+Status change: 'proofreading' (sent to author for proofreading/corrections)
+
+--------------------------------------------------------------------------------
+A20. Author Corrected Proof Submitted (notify assigned publisher)
+--------------------------------------------------------------------------------
+Mailable  : App\Mail\CorrectedProofSubmittedMail
+Path      : app/Mail\CorrectedProofSubmittedMail.php
+View      : resources/views/emails/publisher/correctedProof.blade.php (markdown)
+Subject   : "Author Corrected Proof Submitted - {id}"
+Trigger   : Author corrected_proof() POST
+            app\Http\Controllers\Author\Application\ApplicationRepository.php
+            helper notifyPublisherCorrectedProof()  line ~1720
+Recipient : Assigned publisher (application.assigned_to_id);
+            fallback: first admin with is_admin=1 (superadmin)
+Status change: 'author corrections submitted'
+
+--------------------------------------------------------------------------------
+A21. Manuscript Published (notify author)
+--------------------------------------------------------------------------------
+Mailable  : App\Mail\ManuscriptPublishedMail
+Path      : app/Mail\ManuscriptPublishedMail.php
+View      : resources/views/emails/author/published.blade.php (html)
+Subject   : "Your Manuscript is Published - {id}"
+Trigger   : publish() POST  AND  direct_publish() POST
+            app\Http\Controllers\Admin\Application\ApplicationRepository.php
+            helper notifyAuthorPublished()  line ~1876 (both endpoints)
+Recipient : Author (includes DOI in the body)
+Status change: 'published'  (published_doi saved on application)
+
+================================================================================
+B. UTILITY / ACCOUNT EMAILS
+================================================================================
+
+--------------------------------------------------------------------------------
+B01. OTP (Login Verification)
+--------------------------------------------------------------------------------
+Mailable  : App\Mail\OtpMail
+Path      : app/Mail/OtpMail.php
+View      : resources/views/emails/otp.blade.php
+Subject   : "Your OTP Code"
+Trigger   : Admin login            app\Http\Controllers\Admin\Auth\AdminAuthRepository.php line ~99
+            Author login           app\Http\Controllers\Author\Auth\AuthorAuthRepository.php line ~96
+Recipient : Requesting email
+Status change: none
+
+--------------------------------------------------------------------------------
+B02. Staff Credentials
+--------------------------------------------------------------------------------
+Mailable  : App\Mail\StaffCredentialsMail
+Path      : app/Mail/StaffCredentialsMail.php
+View      : resources/views/emails/staff/credentials.blade.php
+Subject   : "Your Account Credentials - Welcome to JASPI"
+Trigger   : Staff created
+            app\Http\Controllers\Staff\StaffRepository.php line ~309
+Recipient : New staff member
+Status change: none
+
+--------------------------------------------------------------------------------
+B03. Staff Account Activated
+--------------------------------------------------------------------------------
+Mailable  : App\Mail\StaffAccountActivatedMail
+Path      : app/Mail\StaffAccountActivatedMail.php
+View      : resources/views/emails/staff/account-activated.blade.php
+Subject   : "Your Account Has Been Activated - JASPI"
+Trigger   : Staff account activation
+            app\Http\Controllers\Staff\StaffRepository.php line ~266
+Recipient : Staff member
+Status change: none
+
+--------------------------------------------------------------------------------
+B04. Admin Bulk Message
+--------------------------------------------------------------------------------
+Mailable  : App\Mail\AdminMessageMail
+Path      : app/Mail/AdminMessageMail.php
+View      : resources/views/emails/mail-template.blade.php
+Subject   : Dynamic (subject passed in request data)
+Trigger   : Admin sends a message
+            app\Http\Controllers\Mail\MailRepository.php line ~87
+Recipient : Selected recipient(s)
+CC        : akanksha.itconsultant@gmail.com
+BCC       : message sender's email
+Status change: none
+
+================================================================================
+C. MAILER CONFIGURATION
+================================================================================
+Driver is read from config/mail.php → .env (MAIL_MAILER).
+All Mailable classes implement Illuminate\Contracts\Queue\ShouldQueue, so
+dispatch happens via the configured queue connection (or immediately when
+QUEUE_CONNECTION=sync).
+Project root: C:\laragon\www\aiims_manuscript
+
+================================================================================
+D. QUICK STATUS TRANSITION MAP (who sets each status & mail fired)
+================================================================================
+
+  submitted               -> Author submit                          (A01)
+  technical checks        -> Tech editor accept                      (A02)
+  out of scope            -> Tech editor out-of-scope                (A02)
+  revise (tech)           -> Tech editor revise                      (A03)
+  processing              -> Assign handling editor                  (A04 / A05 on decline)
+  assigning reviewers     -> Reviewer assignment / editor decision   (A14 / A15)
+  under review            -> Reviewers accept                        (A14 / A15)
+  re-review               -> Re-review assignment                    (A14 / A15)
+  reviewed                -> All reviews complete                    (A17)
+  editor-accepts          -> Handling editor accepts                 (A06)
+  editor-revise           -> Handling editor requests revision       (A06)
+  editor-rejects          -> Handling editor rejects                 (A06)
+  pre-accepted            -> Requester accepts                       (A09 + A10)
+  rejected                -> Requester rejects                       (A09)
+  revise (requester)      -> Requester changes required              (A09)
+  resubmitted             -> Author re-submits                       (A12)
+  accepted                -> Publisher assigned                      (A11)
+  typesetting review      -> Publisher uploads formatted proof       (A18)
+  proofreading            -> Sent to author for proofreading         (A19)
+  author corrections subm -> Author uploads corrected proof          (A20)
+  published               -> Manuscript published / direct publish   (A21)
+
+================================================================================
+
+
+all mails and editor and rev decision matching style
+opencode -s ses_f5c131054ffeyKB3xCCGIw7ezu

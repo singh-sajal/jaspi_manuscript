@@ -15,6 +15,9 @@
     <meta property="og:image" content="social-image.png" />
     <meta name="format-detection" content="telephone=no" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
 
     <!-- PAGE TITLE HERE -->
     <title>ManuScript Author- @yield('title')</title>
@@ -38,6 +41,7 @@
     <link href="{{ asset('admin/assets/vendor/quill/quill.bubble.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('admin/assets/vendor/quill/quill.snow.css') }}" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="{{ asset('admin/assets/css/datatable.css') }}">
+    <link rel="stylesheet" href="{{ asset('admin/assets/css/notification.css') }}">
     <link rel="stylesheet" href="{{ asset('admin/assets/css/validator.css') }}">
     <style>
         .deznav .metismenu>li>a i {
@@ -134,6 +138,18 @@
             border-bottom: 2px solid white !important;
             color: white !important;
         }
+
+        .page-titles {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            /* position: fixed; */
+        }
+
+        .page-titles .breadcrumb {
+            margin-bottom: 0;
+        }
     </style>
 
     @yield('css')
@@ -155,8 +171,7 @@
         {{-- @include('author.sidebar') --}}
 
 
-        <div class="content-body">
-            <!-- row -->
+        {{-- <div class="content-body">
             <div class="page-titles align-items-center">
                 <ol class="breadcrumb">
                     <li>
@@ -169,7 +184,24 @@
             </div>
             <div class="modal" id="AjaxModal" tabindex="-1"></div>
             @yield('content')
+        </div> --}}
+        <div class="content-body">
+            <!-- row -->
+            <div class="page-titles align-items-center">
+                <ol class="breadcrumb">
+                    <li>
+                        <h5 class="bc-title">@yield('page-title')</h5>
+                    </li>
+                </ol>
+
+                @yield('breadcrumb-button')
+            </div>
+
+            <div class="modal" id="AjaxModal" tabindex="-1"></div>
+
+            @yield('content')
         </div>
+
 
         @include('includes.footer')
 
@@ -202,6 +234,7 @@
     <script src="{{ asset('admin/assets/vendor/sweet-alert/toastr.min.js') }}"></script>
     <script src="{{ asset('admin/assets/vendor/sweet-alert/sweetalert.min.js') }}"></script>
     <script src="{{ asset('admin/assets/js/ajax-engine-1.0.js') }}"></script>
+    <script src="{{ asset('admin/assets/js/notification.js') }}"></script>
 
     <script src="{{ asset('admin/assets/js/pdfmake.min.js') }}"></script>
     <script src="{{ asset('admin/assets/js/vfs_fonts.js') }}"></script>

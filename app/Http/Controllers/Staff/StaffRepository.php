@@ -5,11 +5,16 @@ namespace App\Http\Controllers\Staff;
 use Throwable;
 use App\Models\Admin;
 
+use App\Models\Integration;
 use App\Models\Service;
 use App\Traits\PermissionGuard;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
+use App\Mail\StaffCredentialsMail;
+use App\Mail\StaffAccountActivatedMail;
 
 
 class StaffRepository
@@ -26,11 +31,12 @@ class StaffRepository
 
     public function index($request)
     {
-
+        // $user = Auth::user();
+        // return $user;
         if ($this->canAccessPage('staff')) {
 
-            $perPage = $request->perPage ?? 15;
-            $records = Admin::where('is_admin', false)->with(['roles' => fn($q) => $q->select('id', 'name')]);
+            $perPage = $request->perPage ?? 50;
+            $records = Admin::with(['roles' => fn($q) => $q->select('id', 'name')]);
 
             // dd($records);
 
@@ -65,33 +71,93 @@ class StaffRepository
     public function create($request)
     {
         $roles = Role::where('name', '!=', 'superadmin')->get();
-        return view('admin.cms.staff.create', compact('roles'));
+        $integrations = Integration::orderBy('name')->get();
+        return view('admin.cms.staff.create', compact('roles', 'integrations'));
     }
+    // public function store($request)
+    // {
+    //     try {
+    //         $role = Role::where('name', 'Reviewer')->first();
+    //         // return [$role->name ,$request->role_id];
+    //         $data = [
+    //             'name' => $request->name,
+    //             'email' => $request->email,
+    //             'phone' => $request->phone,
+    //             'username' => generateUniqueId(Admin::class),
+    //             'is_admin' => '0',
+    //             'is_email_verified' => true,
+    //             'is_phone_verified' => true,
+    //             'status' => false,
+    //             'rev_type' => ($role->name == $request->role_id) ? $request->rev_type : null,
+    //         ];
+
+
+
+
+
+    //         if ($request->hasFile('avatar')) {
+    //             $data['avatar'] = uploadFile($request->file('avatar'), $this->basePath);
+    //         }
+
+    //         $created = Admin::create($data);
+    //         if ($created) {
+    //             $created->assignRole($request->role_id);
+    //             if ($created) {
+    //                 $created->assignRole($request->role_id_2);
+    //             }
+    //             return successResponse('Staff Created Successfully');
+    //         }
+    //         return errorResponse('Something went wrong');
+    //     } catch (Throwable $th) {
+    //         return throwException($th);
+    //     }
+    // }
+
     public function store($request)
     {
         try {
+            $roleReviewer = Role::where('name', 'Reviewer')->first();
+
             $data = [
-                'name' => $request->name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'username' => generateUniqueId(Admin::class),
-                'is_admin' => '0',
+                'name'       => $request->name,
+                'email'      => $request->email,
+                'phone'      => $request->phone,
+                'username'   => generateUniqueId(Admin::class),
+                'is_admin'   => $request->is_admin ?? 0,
                 'is_email_verified' => true,
                 'is_phone_verified' => true,
-                'status' => false,
-
+                'status'     => false,
+                'rev_type'   => ($request->role_id == $roleReviewer->id || $request->role_id_2 == $roleReviewer->id)
+                    ? $request->rev_type
+                    : null,
             ];
-
 
             if ($request->hasFile('avatar')) {
                 $data['avatar'] = uploadFile($request->file('avatar'), $this->basePath);
             }
 
             $created = Admin::create($data);
+
             if ($created) {
-                $created->assignRole($request->role_id);
+                // Collect roles
+                $rolesToAssign = [];
+                if (!empty($request->role_id)) {
+                    $rolesToAssign[] = $request->role_id;
+                }
+                if (!empty($request->role_id_2)) {
+                    $rolesToAssign[] = $request->role_id_2;
+                }
+
+                // Assign roles at once
+                if (!empty($rolesToAssign)) {
+                    $created->syncRoles($rolesToAssign);
+                }
+
+                $created->integrations()->sync($request->integrations ?? []);
+
                 return successResponse('Staff Created Successfully');
             }
+
             return errorResponse('Something went wrong');
         } catch (Throwable $th) {
             return throwException($th);
@@ -99,49 +165,75 @@ class StaffRepository
     }
 
 
+
     public function edit($uuid)
     {
         try {
-            $record = Admin::where('is_admin', false)->where('uuid', $uuid)->with('roles')->firstOrFail();
-            $roles = Role::where('name', '!=', 'superadmin')->get();
+            // $record = Admin::where('is_admin', false)->where('uuid', $uuid)->with('roles')->firstOrFail();
+            // $roles = Role::where('name', '!=', 'superadmin')->get();
+
+            $record = Admin::where('uuid', $uuid)->with('roles')->firstOrFail();
+            $roles = Role::all();
             $staffRoles = $record->roles()->pluck('id')->toArray();
-            return view('admin.cms.staff.edit', compact('record', 'roles', 'staffRoles'));
+            $integrations = Integration::orderBy('name')->get();
+            $staffIntegrations = $record->integrations()->pluck('integration_id')->toArray();
+            // return $staffRoles;
+            return view('admin.cms.staff.edit', compact('record', 'roles', 'staffRoles', 'integrations', 'staffIntegrations'));
         } catch (Throwable $th) {
             return throwException($th);
         }
     }
+
 
     public function update($request, $uuid)
     {
         try {
             $record = $this->getStaff($uuid);
+            $roleReviewer = Role::where('name', 'Reviewer')->first();
 
             $data = [
-                'name' => $request->name,
-                'email' => $request->email,
-                'phone' => $request->phone,
+                'name'    => $request->name,
+                'email'   => $request->email,
+                'phone'   => $request->phone,
+                'is_admin' => $request->is_admin ?? 0,
+                'rev_type' => ($request->role_id == $roleReviewer->id || $request->role_id_2 == $roleReviewer->id)
+                    ? $request->rev_type
+                    : null,
             ];
+
 
             if ($request->hasFile('avatar')) {
                 $data['avatar'] = replaceFile($request->file('avatar'), $this->basePath, $record->avatar);
             }
 
+
             $updated = $record->update($data);
 
-            // Sync role
-
             if ($updated) {
+                // Collect roles
+                $rolesToSync = [];
+                if (!empty($request->role_id)) {
+                    $rolesToSync[] = intval($request->role_id);
+                }
+                if (!empty($request->role_id_2)) {
+                    $rolesToSync[] = intval($request->role_id_2);
+                }
 
-                $record->syncRoles([$request->role_id]);
+
+                // Sync roles
+                $record->syncRoles($rolesToSync);
+
+                $record->integrations()->sync($request->integrations ?? []);
+
                 return successResponse('Staff updated successfully');
             }
 
             return errorResponse('Something Went wrong');
-            // return successResponse('Staff updated successfully');
         } catch (Throwable $th) {
             return throwException($th);
         }
     }
+
 
     public function destroy($uuid)
     {
@@ -175,7 +267,15 @@ class StaffRepository
     public function toggleStatus($request, $uuid)
     {
         $staff = $this->getStaff($uuid);
-        if (updateStatus($staff, $request->status, $request->column)) {
+        $toStatus = $request->status == 'active' ? false : true;
+        if ($staff->update([$request->column => $toStatus])) {
+            if ($toStatus && $staff->password != null) {
+                try {
+                    Mail::to($staff->email)->send(new StaffAccountActivatedMail($staff));
+                } catch (\Throwable $e) {
+                    // Email failure should not block status update
+                }
+            }
             return successResponse('Staff Status Updated Successfully');
         } else {
             return errorResponse('Something went wrong');
@@ -213,6 +313,11 @@ class StaffRepository
                     'password' => Hash::make($request->password)
                 ]);
                 if ($updated) {
+                    try {
+                        Mail::to($staff->email)->send(new StaffCredentialsMail($staff, $request->password));
+                    } catch (\Throwable $e) {
+                        // Email failure should not block credential generation
+                    }
                     return successResponse('Credentials Generated Successfully');
                 }
                 return failureResponse('Something went wrong');
@@ -269,7 +374,7 @@ class StaffRepository
         if (!empty($request->sortColumn)) {
             $query->orderBy($request->sortColumn, "{$request->sortDirection}");
         } else {
-            $query->latest('id');
+            $query->orderBy('status');
         }
     }
 }

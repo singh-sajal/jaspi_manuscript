@@ -30,10 +30,10 @@ class AuthorDashboardRepository
         $counts['Total Applications'] = $applicationQuery->count();
         $statusCounts = (clone $applicationQuery)->selectRaw('status, count(*) as count')->groupBy('status')->pluck('count', 'status');
 
-        $counts['Incomplete/Revised Applications'] = ($statusCounts['incomplete'] ?? 0) + ( $statusCounts['revised_submission'] ?? 0);
-        // $counts['Revised Applications'] = $statusCounts['revised_submission'] ?? 0;
-        $counts['Submitted Applications'] = $statusCounts['submitted'] ?? 0;
-        $counts['Under Review Applications'] = $statusCounts['under review'] ?? 0;
+        $counts['Incomplete Applications'] = ($statusCounts['incomplete'] ?? 0);
+        $counts['Technical Modification'] = $statusCounts['submitted'] ?? 0;
+        $counts['Revised Applications'] = $statusCounts['revise'] ?? 0;
+        // $counts['Under Review Applications'] = $statusCounts['under review'] ?? 0;
         $counts['Rejected Applications'] = $statusCounts['rejected'] ?? 0;
         $counts['Published Applications'] = $statusCounts['published'] ?? 0;
 

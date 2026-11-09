@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Application;
 
 
+use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
@@ -18,7 +19,28 @@ class PublishRequest extends FormRequest
     public function rules()
     {
         $commonRules = [
-            'final_script' => 'required|file|mimes:pdf,docx|max:5120', // max: 5MB
+            'file_upload' => ['required', 'file', 'max:5120', function ($attribute, $value, $fail) {
+                // PHP's finfo magic DB on some servers (e.g. Laragon/Windows)
+                // misdetects .docx as application/zip. Laravel's mimes:pdf,docx
+                // then rejects valid Word proofs. Accept the file when its
+                // detected extension (guessExtension) OR its declared extension
+                // resolves to pdf/docx, so legitimate uploads are not blocked.
+                if (! $value instanceof UploadedFile) {
+                    return;
+                }
+
+                $allowed = ['pdf', 'docx'];
+
+                if (in_array(strtolower($value->guessExtension()), $allowed, true)) {
+                    return;
+                }
+
+                if (in_array(strtolower($value->getClientOriginalExtension()), $allowed, true)) {
+                    return;
+                }
+
+                $fail('The file upload must be a file of type: pdf, docx.');
+            }], // max: 5MB
             'comment' => 'nullable|string|max:2000',
         ];
 
@@ -34,7 +56,7 @@ class PublishRequest extends FormRequest
     public function messages()
     {
         return [
-          
+
         ];
     }
     protected function failedValidation(Validator $validator)

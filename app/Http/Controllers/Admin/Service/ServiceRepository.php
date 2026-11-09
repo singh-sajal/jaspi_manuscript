@@ -16,7 +16,7 @@ class ServiceRepository
 
     public function index($request)
     {
-        $perPage = $request->perPage ?? 15;
+        $perPage = $request->perPage ?? 50;
         $records = Service::query()->with('parent');
         $this->search($request, $records);
         $this->sort($request, $records);

@@ -27,7 +27,7 @@
                                 <div class="menu-icon">
                                     <i class="ri-calendar-2-line" width="22" height="22"></i>
                                 </div>
-                                <span class="nav-text">Manu Script</span>
+                                <span class="nav-text">Manuscript</span>
                             </a>
                         </li>
 
@@ -47,6 +47,12 @@
                     </ul>
                 </div>
                 <ul class="navbar-nav header-right">
+
+                    @include('includes.notification-bell', [
+                        'guard' => 'web',
+                        'routePrefix' => 'author',
+                        'textClass' => 'text-white',
+                    ])
 
                     {{-- <li class="nav-item dropdown notification_dropdown">
                         <a class="nav-link text-white" href="javascript:void(0);" role="button"
@@ -215,8 +221,8 @@
                                             alt="" />
                                     </div>
                                     <div class="header-info">
-                                        <h6>{{ ucfirst(authUser('web')->name ?? 'Admin') }}</h6>
-                                        <p>{{ authUser('web')->email ?? 'info@ca.com' }}</p>
+                                        <h6>{{ ucfirst(authUser('web')->name ?? '---') }}</h6>
+                                        <p>{{ authUser('web')->email ?? '---' }}</p>
                                     </div>
                                 </div>
                             </a>
@@ -241,11 +247,7 @@
                                             <span class="ms-2">Profile </span>
                                         </a>
 
-                                        {{-- <a href="#" class="dropdown-item ai-icon">
-                                            <i class="ri-notification-3-line fs-16" height="20"
-                                                width="20"></i>
-                                            <span class="ms-2">Notification </span>
-                                        </a> --}}
+
                                         <a href="#" data-url="{{ route('author.password.update') }}"
                                             class="dropdown-item ai-icon actionHandler">
                                             <i class="ri-lock-line fs-16" height="20" width="20"></i>

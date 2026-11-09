@@ -30,25 +30,25 @@
 
                     <div class="col-6">
                         <label for="coauthor_phone" class="form-label">Co-Author Phone</label>
-                        <input type="text" name="coauthor_phone" id="coauthor_phone" class="form-control"
+                        <input type="number" name="coauthor_phone" id="coauthor_phone" class="form-control"
                             value="{{ $author_data['coauthor_phone'] ?? '' }}" placeholder="Enter phone number"
                             required>
                     </div>
                     <div class="col-6">
                         <label for="author_affiliation" class="form-label required">Co-Author Affiliation</label>
                         <input type="text" class="form-control" id="author_affiliation" name="author_affiliation"
-                            placeholder="Enter author affiliation" required
+                            placeholder="Enter Co-Author Affiliation" required
                             value="{{ $author_data['coauthor_affiliation'] ?? '' }}">
                     </div>
                     <div class="col-6">
-                        <label for="author_orcid_id" class="form-label required">Co-ORCID ID</label>
+                        <label for="author_orcid_id" class="form-label required">Co-Author ORCID ID</label>
                         <input type="text" class="form-control" id="author_orcid_id" name="author_orcid_id"
-                            placeholder="Enter ORCID ID" required value="{{ $author_data['coauthor_orcid_id'] ?? '' }}">
+                            placeholder="Enter Co-Author ORCID ID" required value="{{ $author_data['coauthor_orcid_id'] ?? '' }}">
                     </div>
                     <div class="col-6">
-                        <label for="author_saspi_id" class="form-label">Co-SASPI ID</label>
+                        <label for="author_saspi_id" class="form-label">Co-Author SASPI Membership Number</label>
                         <input type="text" class="form-control" id="author_saspi_id" name="author_saspi_id"
-                            placeholder="Enter SASPI ID" value="{{ $author_data['coauthor_saspi_id'] ?? '' }}">
+                            placeholder="Enter Co-Author SASPI ID" value="{{ $author_data['coauthor_saspi_id'] ?? '' }}">
                     </div>
                 </div>
             </div>
