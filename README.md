@@ -1,10 +1,26 @@
 # aiims_manuscript
 
+<<<<<<< HEAD
+=======
+A Laravel-based web platform designed for doctoral candidates to submit research manuscripts and receive structured staff ratings based on predefined academic standards. Built for the Journal of Antimicrobial Stewardship Practices and Infectious Diseases (JASPI).
+---
+
+🌐 Live Preview [click here](https://manuscript.ilikasofttech.com/)
+
+🚀 [Visit the website (Local)](http://127.0.0.1:8000)
+>>>>>>> 7a4337321d38560c125e67f97fc09ff926f3cb3e
 
 
 ## Getting started
 
+<<<<<<< HEAD
 To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+=======
+- **Backend:** Laravel 9, PHP 8+
+- **Frontend:** Blade, Bootstrap 5, jQuery
+- **Database:** MySQL
+- **Version Control:** Git, GitHub
+>>>>>>> 7a4337321d38560c125e67f97fc09ff926f3cb3e
 
 Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
 
@@ -13,11 +29,22 @@ Already a pro? Just edit this README.md and make it your own. Want to make it ea
 - [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
 - [ ] [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
 
+<<<<<<< HEAD
 ```
 cd existing_repo
 git remote add origin https://gitlab.com/msnegi1982/aiims_manuscript.git
 git branch -M main
 git push -uf origin main
+=======
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/singh-sajal/jaspi_manuscript.git
+cd jaspi-manuscript-system
+>>>>>>> 7a4337321d38560c125e67f97fc09ff926f3cb3e
 ```
 
 ## Integrate with your tools
